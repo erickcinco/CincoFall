@@ -16,8 +16,8 @@
 /* Screen size */
 #define MAX_SCREEN_X     320
 #define MAX_SCREEN_Y     240
-#define MIN_SCREEN_X     30
-#define MIN_SCREEN_Y     30
+#define MIN_SCREEN_X     0
+#define MIN_SCREEN_Y     0
 #define SCREEN_SIZE      76800
 #define TEXT_CHAR_SIZE 10
 
@@ -175,6 +175,9 @@ typedef struct Calib {
  * Attention      : None
  *******************************************************************************/
 void LCD_DrawRectangle(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t Color);
+
+void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t *color_array);
+
 
 /******************************************************************************
 * Function Name  : PutChar

@@ -24,22 +24,22 @@ void BSP_InitBoard()
 	initI2C();
 
 	/* Init Opt3001 */
-	sensorOpt3001Enable(true);
+//	sensorOpt3001Enable(true);
 
 	/* Init Tmp007 */
-	sensorTmp007Enable(true);
+//	sensorTmp007Enable(true);
 
 	/* Init Bmi160 */
-    bmi160_initialize_sensor();
+//    bmi160_initialize_sensor();
 
     /* Init joystick without interrupts */
 	Joystick_Init_Without_Interrupt();
 
 	/* Init Bme280 */
-	bme280_initialize_sensor();
+//	bme280_initialize_sensor();
 
 	/* Init BackChannel UART */
-	BackChannelInit();
+//	BackChannelInit();
 
 	/* Init RGB LEDs */
 	init_RGBLEDS();

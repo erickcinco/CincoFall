@@ -40,6 +40,7 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.INCLUDE_PATH.799863644" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.INCLUDE_PATH" valueType="includePath">
 									<listOptionValue builtIn="false" value="${CCS_BASE_ROOT}/arm/include"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/image_src}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/G8RTOS_Empty_Lab3}"/>
 									<listOptionValue builtIn="false" value="${PROJECT_ROOT}\CC3100SupportPackage\SL_Common"/>
 									<listOptionValue builtIn="false" value="${PROJECT_ROOT}\CC3100SupportPackage\spi_cc3100"/>
@@ -126,6 +127,9 @@
 							<tool id="com.ti.ccstudio.buildDefinitions.MSP432_16.9.hex.1488879107" name="ARM Hex Utility" superClass="com.ti.ccstudio.buildDefinitions.MSP432_16.9.hex.1062432035"/>
 						</toolChain>
 					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

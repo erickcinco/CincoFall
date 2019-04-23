@@ -11,11 +11,11 @@
 /* Includes */
 
 #include <stdint.h>
-#include "bme280_support.h"
-#include "bmi160_support.h"
-#include "opt3001.h"
-#include "tmp007.h"
-#include "BackChannelUart.h"
+//#include "bme280_support.h"
+//#include "bmi160_support.h"
+//#include "opt3001.h"
+//#include "tmp007.h"
+//#include "BackChannelUart.h"
 #include "ClockSys.h"
 #include "RGBLeds.h"
 #include "Joystick.h"

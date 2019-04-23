@@ -17,19 +17,12 @@ ORDERED_OBJS += \
 "./threads.obj" \
 "./BoardSupportPackage/src/AsciiLib.obj" \
 "./BoardSupportPackage/src/BSP.obj" \
-"./BoardSupportPackage/src/BackChannelUart.obj" \
 "./BoardSupportPackage/src/ClockSys.obj" \
 "./BoardSupportPackage/src/Joystick.obj" \
 "./BoardSupportPackage/src/LCDLib.obj" \
 "./BoardSupportPackage/src/RGBLeds.obj" \
-"./BoardSupportPackage/src/bme280.obj" \
-"./BoardSupportPackage/src/bme280_support.obj" \
-"./BoardSupportPackage/src/bmi160.obj" \
-"./BoardSupportPackage/src/bmi160_support.obj" \
 "./BoardSupportPackage/src/demo_sysctl.obj" \
 "./BoardSupportPackage/src/i2c_driver.obj" \
-"./BoardSupportPackage/src/opt3001.obj" \
-"./BoardSupportPackage/src/tmp007.obj" \
 "./BoardSupportPackage/src/uart_cinco.obj" \
 "./CC3100SupportPackage/board/board.obj" \
 "./CC3100SupportPackage/cc3100_usage/cc3100_usage.obj" \
@@ -53,7 +46,7 @@ ORDERED_OBJS += \
 "../BoardSupportPackage/DriverLib/msp432p4xx_driverlib.lib" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
--l"C:/Users/erickcinco/git/MicroP2/BoardSupportPackage/DriverLib/msp432p4xx_driverlib.lib" \
+-l"C:/Users/erickcinco/git/CincoFall/BoardSupportPackage/DriverLib/msp432p4xx_driverlib.lib" \
 
 -include ../makefile.init
 
@@ -174,44 +167,44 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Lab5.out \
+CincoFall.out \
 
 EXE_OUTPUTS__QUOTED += \
-"Lab5.out" \
+"CincoFall.out" \
 
 BIN_OUTPUTS += \
-Lab5.hex \
+CincoFall.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"Lab5.hex" \
+"CincoFall.hex" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Lab5.out"
+	@$(MAKE) --no-print-directory -Onone "CincoFall.out"
 
 # Tool invocations
-Lab5.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
+CincoFall.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -O0 --opt_for_speed=2 --advice:power=all --define=__MSP432P401R__ --define=ccs -g --c99 --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Lab5.map" --heap_size=1024 --stack_size=512 -i"C:/ti/ccsv7/ccs_base/arm/include" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" -i"C:/Users/erickcinco/git/MicroP2/BoardSupportPackage/DriverLib" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Lab5_linkInfo.xml" --rom_model -o "Lab5.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -O0 --opt_for_speed=2 --advice:power=all --define=__MSP432P401R__ --define=ccs -g --c99 --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"CincoFall.map" --heap_size=1024 --stack_size=512 -i"C:/ti/ccsv7/ccs_base/arm/include" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" -i"C:/Users/erickcinco/git/CincoFall/BoardSupportPackage/DriverLib" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="CincoFall_linkInfo.xml" --rom_model -o "CincoFall.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
-Lab5.hex: $(EXE_OUTPUTS)
+CincoFall.hex: $(EXE_OUTPUTS)
 	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo 'Invoking: ARM Hex Utility'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armhex" --memwidth=8 --romwidth=8 -o "Lab5.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armhex" --memwidth=8 --romwidth=8 -o "CincoFall.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Game.obj" "main.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "threads.obj" "BoardSupportPackage\src\AsciiLib.obj" "BoardSupportPackage\src\BSP.obj" "BoardSupportPackage\src\BackChannelUart.obj" "BoardSupportPackage\src\ClockSys.obj" "BoardSupportPackage\src\Joystick.obj" "BoardSupportPackage\src\LCDLib.obj" "BoardSupportPackage\src\RGBLeds.obj" "BoardSupportPackage\src\bme280.obj" "BoardSupportPackage\src\bme280_support.obj" "BoardSupportPackage\src\bmi160.obj" "BoardSupportPackage\src\bmi160_support.obj" "BoardSupportPackage\src\demo_sysctl.obj" "BoardSupportPackage\src\i2c_driver.obj" "BoardSupportPackage\src\opt3001.obj" "BoardSupportPackage\src\tmp007.obj" "BoardSupportPackage\src\uart_cinco.obj" "CC3100SupportPackage\board\board.obj" "CC3100SupportPackage\cc3100_usage\cc3100_usage.obj" "CC3100SupportPackage\simplelink\source\device.obj" "CC3100SupportPackage\simplelink\source\driver.obj" "CC3100SupportPackage\simplelink\source\flowcont.obj" "CC3100SupportPackage\simplelink\source\fs.obj" 
-	-$(RM) "CC3100SupportPackage\simplelink\source\netapp.obj" "CC3100SupportPackage\simplelink\source\netcfg.obj" "CC3100SupportPackage\simplelink\source\nonos.obj" "CC3100SupportPackage\simplelink\source\socket.obj" "CC3100SupportPackage\simplelink\source\spawn.obj" "CC3100SupportPackage\simplelink\source\wlan.obj" "CC3100SupportPackage\spi_cc3100\spi_cc3100.obj" "G8RTOS_Empty_Lab3\G8RTOS_CriticalSection.obj" "G8RTOS_Empty_Lab3\G8RTOS_IPC.obj" "G8RTOS_Empty_Lab3\G8RTOS_Scheduler.obj" "G8RTOS_Empty_Lab3\G8RTOS_SchedulerASM.obj" "G8RTOS_Empty_Lab3\G8RTOS_Semaphores.obj" 
-	-$(RM) "Game.d" "main.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "threads.d" "BoardSupportPackage\src\AsciiLib.d" "BoardSupportPackage\src\BSP.d" "BoardSupportPackage\src\BackChannelUart.d" "BoardSupportPackage\src\ClockSys.d" "BoardSupportPackage\src\Joystick.d" "BoardSupportPackage\src\LCDLib.d" "BoardSupportPackage\src\RGBLeds.d" "BoardSupportPackage\src\bme280.d" "BoardSupportPackage\src\bme280_support.d" "BoardSupportPackage\src\bmi160.d" "BoardSupportPackage\src\bmi160_support.d" "BoardSupportPackage\src\demo_sysctl.d" "BoardSupportPackage\src\i2c_driver.d" "BoardSupportPackage\src\opt3001.d" "BoardSupportPackage\src\tmp007.d" "BoardSupportPackage\src\uart_cinco.d" "CC3100SupportPackage\board\board.d" "CC3100SupportPackage\cc3100_usage\cc3100_usage.d" "CC3100SupportPackage\simplelink\source\device.d" "CC3100SupportPackage\simplelink\source\driver.d" "CC3100SupportPackage\simplelink\source\flowcont.d" "CC3100SupportPackage\simplelink\source\fs.d" "CC3100SupportPackage\simplelink\source\netapp.d" 
-	-$(RM) "CC3100SupportPackage\simplelink\source\netcfg.d" "CC3100SupportPackage\simplelink\source\nonos.d" "CC3100SupportPackage\simplelink\source\socket.d" "CC3100SupportPackage\simplelink\source\spawn.d" "CC3100SupportPackage\simplelink\source\wlan.d" "CC3100SupportPackage\spi_cc3100\spi_cc3100.d" "G8RTOS_Empty_Lab3\G8RTOS_IPC.d" "G8RTOS_Empty_Lab3\G8RTOS_Scheduler.d" "G8RTOS_Empty_Lab3\G8RTOS_Semaphores.d" 
+	-$(RM) "Game.obj" "main.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "threads.obj" "BoardSupportPackage\src\AsciiLib.obj" "BoardSupportPackage\src\BSP.obj" "BoardSupportPackage\src\ClockSys.obj" "BoardSupportPackage\src\Joystick.obj" "BoardSupportPackage\src\LCDLib.obj" "BoardSupportPackage\src\RGBLeds.obj" "BoardSupportPackage\src\demo_sysctl.obj" "BoardSupportPackage\src\i2c_driver.obj" "BoardSupportPackage\src\uart_cinco.obj" "CC3100SupportPackage\board\board.obj" "CC3100SupportPackage\cc3100_usage\cc3100_usage.obj" "CC3100SupportPackage\simplelink\source\device.obj" "CC3100SupportPackage\simplelink\source\driver.obj" "CC3100SupportPackage\simplelink\source\flowcont.obj" "CC3100SupportPackage\simplelink\source\fs.obj" "CC3100SupportPackage\simplelink\source\netapp.obj" "CC3100SupportPackage\simplelink\source\netcfg.obj" "CC3100SupportPackage\simplelink\source\nonos.obj" "CC3100SupportPackage\simplelink\source\socket.obj" "CC3100SupportPackage\simplelink\source\spawn.obj" "CC3100SupportPackage\simplelink\source\wlan.obj" 
+	-$(RM) "CC3100SupportPackage\spi_cc3100\spi_cc3100.obj" "G8RTOS_Empty_Lab3\G8RTOS_CriticalSection.obj" "G8RTOS_Empty_Lab3\G8RTOS_IPC.obj" "G8RTOS_Empty_Lab3\G8RTOS_Scheduler.obj" "G8RTOS_Empty_Lab3\G8RTOS_SchedulerASM.obj" "G8RTOS_Empty_Lab3\G8RTOS_Semaphores.obj" 
+	-$(RM) "Game.d" "main.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "threads.d" "BoardSupportPackage\src\AsciiLib.d" "BoardSupportPackage\src\BSP.d" "BoardSupportPackage\src\ClockSys.d" "BoardSupportPackage\src\Joystick.d" "BoardSupportPackage\src\LCDLib.d" "BoardSupportPackage\src\RGBLeds.d" "BoardSupportPackage\src\demo_sysctl.d" "BoardSupportPackage\src\i2c_driver.d" "BoardSupportPackage\src\uart_cinco.d" "CC3100SupportPackage\board\board.d" "CC3100SupportPackage\cc3100_usage\cc3100_usage.d" "CC3100SupportPackage\simplelink\source\device.d" "CC3100SupportPackage\simplelink\source\driver.d" "CC3100SupportPackage\simplelink\source\flowcont.d" "CC3100SupportPackage\simplelink\source\fs.d" "CC3100SupportPackage\simplelink\source\netapp.d" "CC3100SupportPackage\simplelink\source\netcfg.d" "CC3100SupportPackage\simplelink\source\nonos.d" "CC3100SupportPackage\simplelink\source\socket.d" "CC3100SupportPackage\simplelink\source\spawn.d" "CC3100SupportPackage\simplelink\source\wlan.d" "CC3100SupportPackage\spi_cc3100\spi_cc3100.d" 
+	-$(RM) "G8RTOS_Empty_Lab3\G8RTOS_IPC.d" "G8RTOS_Empty_Lab3\G8RTOS_Scheduler.d" "G8RTOS_Empty_Lab3\G8RTOS_Semaphores.d" 
 	-$(RM) "G8RTOS_Empty_Lab3\G8RTOS_CriticalSection.d" "G8RTOS_Empty_Lab3\G8RTOS_SchedulerASM.d" 
 	-@echo 'Finished clean'
 	-@echo ' '

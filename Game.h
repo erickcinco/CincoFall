@@ -316,7 +316,8 @@ void InitBoardState();
 
 void host_end_game_screen(void);
 void client_end_game_screen();
-void quit_screen(void);
+void quit_screen_host(void);
+void quit_screen_client(void);
 void color_screen(uint16_t winner_color);
 
 /*********************************************** Public Functions *********************************************************************/
