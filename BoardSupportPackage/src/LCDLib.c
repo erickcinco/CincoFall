@@ -9,6 +9,7 @@
 #include "msp.h"
 #include "driverlib.h"
 #include "AsciiLib.h"
+//#include "stage.h"
 
 Calib calibration;
 uint16_t write_pink_flag = 0;
@@ -824,5 +825,31 @@ Point find_wrap_around(Point initial_point, Velocity speed, wrapType wrap){
     return new_point;
 }
 */
+
+void draw_stage_block(uint16_t block_colors[stage_block_size][stage_block_size], int16_t xStart,
+                      int16_t yStart) {
+
+    /* Set window area for high-speed RAM write */
+    LCD_WriteReg(HOR_ADDR_START_POS, yStart);     /* Horizontal GRAM Start Address */
+    LCD_WriteReg(HOR_ADDR_END_POS, (yStart + stage_block_size - 1));  /* Horizontal GRAM End Address */
+    LCD_WriteReg(VERT_ADDR_START_POS, xStart);    /* Vertical GRAM Start Address */
+    LCD_WriteReg(VERT_ADDR_END_POS, (xStart + stage_block_size - 1)); /* Vertical GRAM End Address */
+
+    /* Set cursor */
+    LCD_SetCursor(xStart, (yStart + stage_block_size - 1));
+    /* Set index to GRAM */
+    LCD_WriteIndex(GRAM);
+    /* Send out data only to the entire area */
+    SPI_CS_LOW; // set chip select upon start
+    SPISendRecvByte(SPI_START | SPI_WR | SPI_DATA); // start condition   /* Write : RS = 1, RW = 0       */
+    for(uint16_t i=xStart; i<(xStart + stage_block_size - 1); i++)
+    {
+        for(uint16_t j=yStart; j<(yStart + stage_block_size - 1); j++)
+        {
+            LCD_Write_Data_Only(block_colors[i][j]);
+        }
+    }
+}
+
 /************************************  Public Functions  *******************************************/
 

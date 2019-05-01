@@ -385,6 +385,12 @@ void calibrate_tp();
 //Point find_wrap_around(Point initial_point, Velocity speed, wrapType wrap);
 //
 
+#ifndef stage_block_size
+#define stage_block_size 8
+#endif
+void draw_stage_block(uint16_t block_colors[stage_block_size][stage_block_size], int16_t xStart,
+                      int16_t yStart);
+
 /************************************ Public Functions  *******************************************/
 
 #endif /* LCDLIB_H_ */
