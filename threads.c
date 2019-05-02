@@ -519,6 +519,8 @@ void GenerateBall() {
 
 void MoveBall() {
     uint_fast8_t ball_index;
+    int16_t velocity_x = MAX_BALL_SPEED;
+    int16_t velocity_y = MAX_BALL_SPEED;
     for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
     {
         if(game_state.balls[ball_index].alive == false)
@@ -534,23 +536,28 @@ void MoveBall() {
 
     game_state.balls[ball_index].color = LCD_WHITE;
 
-    game_state.balls[ball_index].currentCenterX = MAX_SCREEN_X/2;
+    game_state.balls[ball_index].currentCenterX = game_state.players[0].currentCenter+PLAYER_LEN_D2;
 //            (rand() % (HORIZ_CENTER_MAX_BALL - HORIZ_CENTER_MIN_BALL)) +
 //            HORIZ_CENTER_MIN_BALL;
-    game_state.balls[ball_index].currentCenterY = (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)/2;
+    game_state.balls[ball_index].currentCenterY = ARENA_MAX_Y-PLAYER_WID_D2;
 //            (rand() % (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)) +
 //            VERT_CENTER_MIN_BALL;
 
     // Start with random velocity
-    int16_t velocity_x = ((rand() % MAX_BALL_SPEED * 2) - MAX_BALL_SPEED);
-    int16_t velocity_y = ((rand() % MAX_BALL_SPEED * 2) - MAX_BALL_SPEED);
-
-    if(velocity_x == 0){
-        velocity_x++;
+    if(joystick_host_x_coor < 0)
+    {
+        velocity_x = -MAX_BALL_SPEED;
     }
-    if(velocity_y == 0){
-        velocity_y++;
+    if(joystick_host_y_coor < 0)
+    {
+        velocity_y = -MAX_BALL_SPEED;
     }
+//    if(velocity_x == 0){
+//        velocity_x++;
+//    }
+//    if(velocity_y == 0){
+//        velocity_y++;
+//    }
 
     while(1)
     {
@@ -615,71 +622,71 @@ void MoveBall() {
         }
 
         // paddle 0
-        {
-            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
-            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
-            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
-                    game_state.players[0].currentCenter;
-            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
-                    BOTTOM_PADDLE_EDGE - WIGGLE_ROOM;
-            if(abs(dx) <= w && abs(dy) <= h)
-            {
-                // bounce the ball off of paddle 0 (the bottom paddle)
-                if(game_state.balls[ball_index].currentCenterY > BOTTOM_PADDLE_EDGE)
-                    game_state.balls[ball_index].currentCenterY = BOTTOM_PADDLE_EDGE - BALL_SIZE;
-
-                if(!wall_collision_already_detected)
-                    predictedCenterX = game_state.balls[ball_index].currentCenterX + velocity_x;
-                predictedCenterY = 2*BOTTOM_PADDLE_EDGE - game_state.balls[ball_index].currentCenterY + velocity_y;
-                velocity_y = -velocity_y;
-                game_state.balls[ball_index].color = game_state.players[0].color;
-            }
-        }
+//        {
+//            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
+//            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
+//            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
+//                    game_state.players[0].currentCenter;
+//            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
+//                    BOTTOM_PADDLE_EDGE - WIGGLE_ROOM;
+//            if(abs(dx) <= w && abs(dy) <= h)
+//            {
+//                // bounce the ball off of paddle 0 (the bottom paddle)
+//                if(game_state.balls[ball_index].currentCenterY > BOTTOM_PADDLE_EDGE)
+//                    game_state.balls[ball_index].currentCenterY = BOTTOM_PADDLE_EDGE - BALL_SIZE;
+//
+//                if(!wall_collision_already_detected)
+//                    predictedCenterX = game_state.balls[ball_index].currentCenterX + velocity_x;
+//                predictedCenterY = 2*BOTTOM_PADDLE_EDGE - game_state.balls[ball_index].currentCenterY + velocity_y;
+//                velocity_y = -velocity_y;
+//                game_state.balls[ball_index].color = game_state.players[0].color;
+//            }
+//        }
 
         // paddle 1
-        {
-            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
-            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
-            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
-                    game_state.players[1].currentCenter;
-            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
-                    TOP_PADDLE_EDGE + WIGGLE_ROOM;
-            if(abs(dx) <= w && abs(dy) <= h)
-            {
-                // bounce the ball off of paddle 1 (the top paddle)
-                if(game_state.balls[ball_index].currentCenterY < TOP_PADDLE_EDGE)
-                    game_state.balls[ball_index].currentCenterY = TOP_PADDLE_EDGE + BALL_SIZE;
-                if(!wall_collision_already_detected)
-                    predictedCenterX = game_state.balls[ball_index].currentCenterX + velocity_x;
-                predictedCenterY = 2*TOP_PADDLE_EDGE - game_state.balls[ball_index].currentCenterY + velocity_y;
-                velocity_y = -velocity_y;
-                game_state.balls[ball_index].color = game_state.players[1].color;
-            }
-        }
+//        {
+//            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
+//            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
+//            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
+//                    game_state.players[1].currentCenter;
+//            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
+//                    TOP_PADDLE_EDGE + WIGGLE_ROOM;
+//            if(abs(dx) <= w && abs(dy) <= h)
+//            {
+//                // bounce the ball off of paddle 1 (the top paddle)
+//                if(game_state.balls[ball_index].currentCenterY < TOP_PADDLE_EDGE)
+//                    game_state.balls[ball_index].currentCenterY = TOP_PADDLE_EDGE + BALL_SIZE;
+//                if(!wall_collision_already_detected)
+//                    predictedCenterX = game_state.balls[ball_index].currentCenterX + velocity_x;
+//                predictedCenterY = 2*TOP_PADDLE_EDGE - game_state.balls[ball_index].currentCenterY + velocity_y;
+//                velocity_y = -velocity_y;
+//                game_state.balls[ball_index].color = game_state.players[1].color;
+//            }
+//        }
         // bottom wall
-        {
-            if(game_state.balls[ball_index].currentCenterY  > BOTTOM_PLAYER_CENTER_Y)// BOTTOM_PLAYER_CENTER_Y
-            {
-                // kill ball
-                game_state.balls[ball_index].kill_me = true;
-                if(game_state.balls[ball_index].color == game_state.players[1].color)
-                {
-                    // increment score for top player
-                    game_state.LEDScores[1]++;
-                    if(game_state.LEDScores[1] >= MAX_LED_SCORE)
-                    {
-                        winner = game_state.players[1].color;
-                        game_state.overallScores[1]++;
-                        game_state.winner = true;
-                        update_game_score = true;
-//                        G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
-                    }
-                    G8RTOS_SignalSemaphore(&led_mutex);
-                }
-                G8RTOS_KillSelf();
-                while(1);
-            }
-        }
+//        {
+//            if(game_state.balls[ball_index].currentCenterY  > BOTTOM_PLAYER_CENTER_Y)// BOTTOM_PLAYER_CENTER_Y
+//            {
+//                // kill ball
+//                game_state.balls[ball_index].kill_me = true;
+//                if(game_state.balls[ball_index].color == game_state.players[1].color)
+//                {
+//                    // increment score for top player
+//                    game_state.LEDScores[1]++;
+//                    if(game_state.LEDScores[1] >= MAX_LED_SCORE)
+//                    {
+//                        winner = game_state.players[1].color;
+//                        game_state.overallScores[1]++;
+//                        game_state.winner = true;
+//                        update_game_score = true;
+////                        G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+//                    }
+//                    G8RTOS_SignalSemaphore(&led_mutex);
+//                }
+//                G8RTOS_KillSelf();
+//                while(1);
+//            }
+//        }
 
         // top wall
         {
