@@ -24,16 +24,19 @@ collision_dir check_collision(Point location, int16_t x_size, int16_t y_size,
     int16_t new_x = location.x + x_velocity;
     int16_t new_y = location.y + y_velocity;
 
-    if((abs(new_x - stage_piece->x) * 2 < (x_size + stage_piece->x_size)) &&
-       (abs(new_y - stage_piece->y) * 2 < (y_size + stage_piece->y_size)))
+    if(((new_x <= (stage_piece->x + stage_piece->x_size)) &&
+            ((new_x + x_size) >= stage_piece->x)) &&
+       ((new_y <= (stage_piece->y + stage_piece->y_size)) &&
+            ((new_y + y_size) >= stage_piece->y)))
     {
         // if the location came from the y direction (because x still passing collision check)
-        if(abs(location.x - stage_piece->x) * 2 < (x_size + stage_piece->x_size))
+        if(((location.x <= (stage_piece->x + stage_piece->x_size)) &&
+                ((location.x + x_size) >= stage_piece->x)))
         {
             if(location.y < stage_piece->y) // if it's below the block and hitting it
-                return up;
+                return top;
             else // if it's above it and hitting it
-                return down;
+                return bottom;
         }
         // if the location came from the x direction
         else

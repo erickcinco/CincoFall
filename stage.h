@@ -41,7 +41,7 @@ typedef struct stage_piece {
     uint16_t * texture;
 } stage_piece_t;
 
-typedef enum {none, left, right, up, down} collision_dir;
+typedef enum {none, left, right, top, bottom} collision_dir;
 
 static stage_piece_t stage_1[] = {
                            {0, 0, 16, MAX_SCREEN_X, test_texture}, // left border

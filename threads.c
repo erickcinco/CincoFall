@@ -504,6 +504,35 @@ extern void ReadJoystickHost(void){
 //        {
 //            displacement = 1;
 //        }
+        collision_dir dir;
+
+        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+        {
+            Point player_position = {game_state.players[0].x,
+                                     game_state.players[0].y};
+            dir = check_collision(player_position,
+                                  PLAYER_LEN, PLAYER_WID,
+                                  displacement_x, displacement_y,
+                                  &stage_1[i]);
+            if(dir != none)
+            {
+                switch(dir)
+                {
+                case bottom:
+                case top:
+                    displacement_y = 0;
+                    break;
+                case left:
+                case right:
+                    displacement_x = 0;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        joystick_thread_end:
         game_state.players[0].x += displacement_x; // update player 0 who is the host players is part of game state struct
         game_state.players[0].y += displacement_y;
         game_state.players[1].x += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
