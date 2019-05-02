@@ -176,8 +176,9 @@ typedef struct Calib {
  *******************************************************************************/
 void LCD_DrawRectangle(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t Color);
 
-void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t *color_array);
+void LCD_Draw_Textured_Block(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t * texture);
 
+void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t *color_array);
 
 /******************************************************************************
 * Function Name  : PutChar

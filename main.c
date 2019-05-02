@@ -5,7 +5,8 @@
 #include "Game.h"
 #include <driverlib.h>
 #include <core_cm4.h>
-//#include "fighter_cat_gif_color_array_no_background.h"
+#include "fighter_cat_gif_color_array_no_background.h"
+#include "stage.h"
 //#include "fighter_cat_gif_color_array.h"
 #include "G8RTOS.h"
 
@@ -21,6 +22,11 @@ uint_fast64_t num_packets_received = 0;
 void main(void) {
     G8RTOS_Init();
     LCD_Clear(BACK_COLOR);
+
+    for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+    {
+        draw_stage_piece(&stage_1[i]);
+    }
 //    LCD_Draw_Sprite(0, CAT_SPRITE_WIDTH, 0, CAT_SPRITE_HEIGHT, cat_color_array);
 //    LCD_Draw_Sprite(100, 100 + PARROT_SPRITE_WIDTH, 100, 100 + PARROT_SPRITE_HEIGHT, parrot_color_array);
 //    LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + DOG_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + DOG_SPRITE_HEIGHT, dog_color_array);

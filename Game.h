@@ -29,6 +29,9 @@
 #define MAX_NUM_OF_PLAYERS  2
 #define MAX_NUM_OF_BALLS    10
 
+/* Size of the texture square measured in one direction */
+#define TEXTURE_SIZE 16
+
 // This game can actually be played with 4 players... a little bit more challenging, but doable! 
 #define NUM_OF_PLAYERS_PLAYING 2
 
