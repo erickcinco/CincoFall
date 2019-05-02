@@ -944,6 +944,12 @@ void MoveBall_client() {
 
     while(1)
     {
+        if(game_state.balls[ball_index].kill_me ||
+           !game_state.balls[ball_index].alive)
+        {
+            G8RTOS_KillSelf();
+            while(1);
+        }
         static int16_t predictedCenterX = 0;
         static int16_t predictedCenterY = 0;
         static bool collision_predicted = false;
