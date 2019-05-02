@@ -54,16 +54,19 @@
 #define PLAYER_WID_D2                (PLAYER_WID >> 1)
 
 // start out in the middle of respective side of stage
-#define PLAYER_1_CENTER              MAX_SCREEN_X >> 2
-#define PLAYER_2_CENTER              MAX_SCREEN_X - (MAX_SCREEN_X >> 2) - FIGHTER_CAT_SPRITE_WIDTH
+#define PLAYER_1_CENTER_X              MAX_SCREEN_X >> 2
+#define PLAYER_2_CENTER_X              MAX_SCREEN_X - (MAX_SCREEN_X >> 2) - FIGHTER_CAT_SPRITE_WIDTH
+#define PLAYER_CENTER_Y                ARENA_MAX_Y-PLAYER_WID
+
 
 /* Centers for paddles at the center of the sides */
 #define PADDLE_X_CENTER              MAX_SCREEN_X >> 1
 
 /* Edge limitations for player's center coordinate */
-#define HORIZ_CENTER_MAX_PL          (ARENA_MAX_X - PLAYER_LEN_D2)
-#define HORIZ_CENTER_MIN_PL          (ARENA_MIN_X + PLAYER_LEN_D2)
-
+#define HORIZ_CENTER_MAX_PL          (ARENA_MAX_X - PLAYER_LEN)
+#define HORIZ_CENTER_MIN_PL          (ARENA_MIN_X + PLAYER_LEN)
+#define VERT_CENTER_MAX_PL          (ARENA_MAX_Y - PLAYER_WID)
+#define VERT_CENTER_MIN_PL          (ARENA_MIN_Y + PLAYER_WID)
 //#define HORIZ_CENTER_MAX_PL          (ARENA_MAX_X - PADDLE_LEN_D2)
 //#define HORIZ_CENTER_MIN_PL          (ARENA_MIN_X + PADDLE_LEN_D2)
 
@@ -153,7 +156,7 @@ typedef struct
  */
 typedef struct
 {
-    int16_t currentCenter;
+    Point currentCenter;
     uint16_t color;
     uint16_t *texture;
     playerPosition position;
@@ -201,7 +204,7 @@ typedef struct
  */
 typedef struct
 {
-    int16_t Center;
+    Point Center;
 }PrevPlayer_t;
 /*********************************************** Data Structures ********************************************************************/
 

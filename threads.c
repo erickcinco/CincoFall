@@ -124,10 +124,10 @@ void DrawBoundary(void){
 }
 
 void DrawPlayer(GeneralPlayerInfo_t * player){
-    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
-    int16_t y_end = ARENA_MAX_Y;
-    int16_t x_start = player->currentCenter;
-    int16_t x_end = player->currentCenter + PLAYER_LEN;
+    int16_t y_start = player->currentCenter.y;
+    int16_t y_end =  player->currentCenter.y + PLAYER_WID;
+    int16_t x_start = player->currentCenter.x;
+    int16_t x_end = player->currentCenter.x + PLAYER_LEN;
 
     // handle boundary case for x direction
 //    if(x_start < ARENA_MIN_X)
@@ -166,8 +166,10 @@ void DrawPlayer(GeneralPlayerInfo_t * player){
 void DrawObjects(void){
     PrevPlayer_t prev_red_x;
     PrevPlayer_t prev_blue_x;
-    prev_red_x.Center = game_state.players[1].currentCenter;
-    prev_blue_x.Center = game_state.players[0].currentCenter;
+    prev_red_x.Center.x = game_state.players[1].currentCenter.x;
+    prev_red_x.Center.y = game_state.players[1].currentCenter.y;
+    prev_blue_x.Center.x = game_state.players[0].currentCenter.x;
+    prev_blue_x.Center.x = game_state.players[0].currentCenter.y;
     PrevBall_t prev_ball_array[MAX_NUM_OF_BALLS];
 
     // Init prev ball array
@@ -236,10 +238,10 @@ void DrawObjects(void){
         }
 
         // update paddles
-        if(game_state.players[1].currentCenter != prev_red_x.Center){
+        if(game_state.players[1].currentCenter.x != prev_red_x.Center.x || game_state.players[1].currentCenter.y != prev_red_x.Center.y){
             UpdatePlayerOnScreen(&prev_red_x, &(game_state.players[1]));
         }
-        if(game_state.players[0].currentCenter != prev_blue_x.Center){
+        if(game_state.players[0].currentCenter.x != prev_blue_x.Center.x || game_state.players[0].currentCenter.y != prev_blue_x.Center.y){
             UpdatePlayerOnScreen(&prev_blue_x, &(game_state.players[0]));
         }
         prev_red_x.Center = game_state.players[1].currentCenter;
@@ -250,25 +252,42 @@ void DrawObjects(void){
 
 void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * outPlayer){
     // only update if new center is different than past center
-    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
-    int16_t y_end = ARENA_MAX_Y;
-    int16_t x_old_start = (prevPlayerIn->Center);
-    int16_t x_old_end = (prevPlayerIn->Center) + PLAYER_LEN;
-    int16_t x_new_start = (outPlayer->currentCenter);
-    int16_t x_new_end = (outPlayer->currentCenter) + PLAYER_LEN;
+    int16_t y_old_start = (prevPlayerIn->Center.y);
+    int16_t y_old_end = (prevPlayerIn->Center.y) + PLAYER_WID;
+    int16_t y_new_start = outPlayer->currentCenter.y;
+    int16_t y_new_end = outPlayer->currentCenter.y + PLAYER_WID;
+
+    int16_t x_old_start = (prevPlayerIn->Center.x);
+    int16_t x_old_end = (prevPlayerIn->Center.x) + PLAYER_LEN;
+    int16_t x_new_start = (outPlayer->currentCenter.x);
+    int16_t x_new_end = (outPlayer->currentCenter.x) + PLAYER_LEN;
     // handle boundary case for x direction
-//    if(x_new_start < ARENA_MIN_X + 2)
-//    {
-//        outPlayer->currentCenter = HORIZ_CENTER_MIN_PL + 2;
-//        x_new_start = ARENA_MIN_X + 2;
-//        x_new_end = ARENA_MIN_X + 2 + PADDLE_LEN;
-//    }
-//    if(x_new_end >= ARENA_MAX_X - 2)
-//    {
-//        outPlayer->currentCenter = HORIZ_CENTER_MAX_PL - 2;
-//        x_new_start = ARENA_MAX_X - 2 - PADDLE_LEN;
-//        x_new_end = ARENA_MAX_X - 2;
-//    }
+    if(x_new_start < ARENA_MIN_X + 2)
+    {
+        outPlayer->currentCenter.x = HORIZ_CENTER_MIN_PL + 2;
+        x_new_start = outPlayer->currentCenter.x;
+        x_new_end = outPlayer->currentCenter.x + PLAYER_LEN;
+    }
+    if(x_new_end >= ARENA_MAX_X - 2)
+    {
+        outPlayer->currentCenter.x = HORIZ_CENTER_MAX_PL - 2;
+        x_new_start = outPlayer->currentCenter.x;
+        x_new_end = outPlayer->currentCenter.x - PLAYER_LEN;
+    }
+    if(y_new_start < ARENA_MIN_Y + 2)
+    {
+        outPlayer->currentCenter.y = VERT_CENTER_MIN_PL + 2;
+        y_new_start = outPlayer->currentCenter.y;
+        y_new_end = outPlayer->currentCenter.y + PLAYER_WID;
+    }
+    if(y_new_end >= ARENA_MAX_Y - 2)
+    {
+        outPlayer->currentCenter.y = VERT_CENTER_MAX_PL - 2;
+        y_new_start = outPlayer->currentCenter.y;
+        y_new_end = outPlayer->currentCenter.y - PLAYER_WID;
+    }
+
+
 //    // handle y start and end
 //    if(outPlayer->position == BOTTOM)
 //    {
@@ -285,8 +304,8 @@ void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * out
     {
 
         G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start, y_end, BACK_COLOR);
-        LCD_Draw_Sprite(x_new_start, x_new_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
+        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_old_start-WIGGLE_ROOM, y_old_end+WIGGLE_ROOM, BACK_COLOR);
+        LCD_Draw_Sprite(x_new_start, x_new_end, y_new_start, y_new_end, fighter_cat_gif_color_array_frame_0);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
     // clear stale paddle data
@@ -408,8 +427,12 @@ extern void CreateGame(void){
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.players[0].currentCenter = PLAYER_1_CENTER; // start with paddles in center of screen
-    game_state.players[1].currentCenter = PLAYER_2_CENTER; // start with paddles in center of screen
+    game_state.players[0].currentCenter.x = PLAYER_1_CENTER_X; // start with paddles in center of screen
+    game_state.players[0].currentCenter.y = PLAYER_CENTER_Y; // start with paddles in center of screen
+
+    game_state.players[1].currentCenter.x = PLAYER_2_CENTER_X; // start with paddles in center of screen
+    game_state.players[1].currentCenter.y = PLAYER_CENTER_Y; // start with paddles in center of screen
+
     game_state.overallScores[0] = 0;
     game_state.overallScores[1] = 0;
     game_state.LEDScores[0] = 0;
@@ -457,12 +480,14 @@ extern void CreateGame(void){
 }
 
 extern void ReadJoystickHost(void){
-    int16_t displacement = 0;
+    int16_t displacement_x = 0;
+    int16_t displacement_y = 0;
+
     while(1){
         GetJoystickCoordinates(&joystick_host_x_coor, &joystick_host_y_coor);
         // do we need to bias the value?
-        displacement = joystick_host_x_coor / -4096;
-
+        displacement_x = joystick_host_x_coor / -4096;
+        displacement_y = joystick_host_y_coor / 4096;
 //        if(joystick_host_x_coor > 8000)
 //        {
 //            displacement = -1;
@@ -479,8 +504,12 @@ extern void ReadJoystickHost(void){
 //        {
 //            displacement = 1;
 //        }
-        game_state.players[0].currentCenter += displacement; // update player 0 who is the host players is part of game state struct
-        game_state.players[1].currentCenter += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
+        game_state.players[0].currentCenter.x += displacement_x; // update player 0 who is the host players is part of game state struct
+        game_state.players[0].currentCenter.y += displacement_y; // update player 0 who is the host players is part of game state struct
+        // TODO Handle client shit
+        game_state.players[1].currentCenter.x += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
+        game_state.players[1].currentCenter.x += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
+
 
         sleep(10);
     }
@@ -603,7 +632,7 @@ void MoveBall() {
             int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
             int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
             int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
-                    game_state.players[0].currentCenter;
+                    game_state.players[0].currentCenter.x;
             int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
                     BOTTOM_PADDLE_EDGE - WIGGLE_ROOM;
             if(abs(dx) <= w && abs(dy) <= h)
@@ -625,7 +654,7 @@ void MoveBall() {
             int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
             int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
             int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
-                    game_state.players[1].currentCenter;
+                    game_state.players[1].currentCenter.x;
             int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
                     TOP_PADDLE_EDGE + WIGGLE_ROOM;
             if(abs(dx) <= w && abs(dy) <= h)
@@ -755,7 +784,7 @@ void EndOfGameHost() {
             game_state.gameDone = false;
             for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
             {
-                game_state.players[i].currentCenter = PADDLE_X_CENTER; // start with paddles in center of screen
+                game_state.players[i].currentCenter.x = PADDLE_X_CENTER; // start with paddles in center of screen
                 game_state.LEDScores[i] = 0;
             }
             game_state.LEDScores[0] = 0;
@@ -991,7 +1020,7 @@ extern void JoinGame(void) {
     game_state.gameDone = false;
     for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
     {
-        game_state.players[i].currentCenter = PADDLE_X_CENTER; // start with paddles in center of screen
+        game_state.players[i].currentCenter.x = PADDLE_X_CENTER; // start with paddles in center of screen
         game_state.LEDScores[i] = 0;
     }
     game_state.overallScores[0] = 0;
