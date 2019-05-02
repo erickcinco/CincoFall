@@ -46,7 +46,11 @@ static GameState_t game_state;
 static SpecificPlayerInfo_t new_client_data;
 static SpecificPlayerInfo_t client_player;
 
-int16_t client_displacement; // global variable for host
+int16_t client_displacement_x; // global variable for host
+int16_t client_displacement_y; // global variable for host
+
+ball_dir client_new_ball_dir = BALL_none;
+
 bool fire_delay = false;
 
 char display_score_buffer_0[10];
@@ -54,7 +58,6 @@ char display_score_buffer_1[10];
 
 void ball_thread(void);
 void idle_thread(void);
-void DrawScore(void);
 void DrawBoundary(void);
 void end_game_button_press(void);
 
@@ -70,50 +73,7 @@ bool check_end_game_buttons = false;
 uint8_t winner;
 endGameAction end_game_action = NOTHING;
 
-void DrawScore(void){
 
-    char zero_text[] = "0";
-    sprintf(display_score_buffer_0, "%d", game_state.overallScores[0]);
-    sprintf(display_score_buffer_1, "%d", game_state.overallScores[1]);
-
-    // clear text area
-    G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_DrawRectangle(1, ARENA_MIN_X - BOUNDARY_WIDTH - 1, 10, 30, LCD_BLACK);
-    G8RTOS_SignalSemaphore(&lcd_SPI);
-
-    G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_DrawRectangle(1, ARENA_MIN_X - BOUNDARY_WIDTH - 1, MAX_SCREEN_Y - 20, MAX_SCREEN_Y, LCD_BLACK);
-    G8RTOS_SignalSemaphore(&lcd_SPI);
-
-    // update score
-    if(game_state.overallScores[1] < 10)
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text(1, 10, zero_text, LCD_WHITE);
-        LCD_Text(1+TEXT_CHAR_SIZE, 10, display_score_buffer_1, LCD_WHITE);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-    }
-    else
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text(1, 10, display_score_buffer_1, LCD_WHITE);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-    }
-
-    if(game_state.overallScores[0] < 10)
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text(1, MAX_SCREEN_Y - 20, zero_text, LCD_WHITE);
-        LCD_Text(1+TEXT_CHAR_SIZE, MAX_SCREEN_Y - 20, display_score_buffer_0, LCD_WHITE);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-    }
-    else
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text(1, MAX_SCREEN_Y - 20, display_score_buffer_0, LCD_WHITE);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-    }
-}
 
 void DrawBoundary(void){
     //LEFT
@@ -464,7 +424,6 @@ extern void CreateGame(void){
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
-//    DrawScore();
     for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
     {
         DrawPlayer(&(game_state.players[i])); // put the player at the center of the screen upon starting game
@@ -483,7 +442,7 @@ extern void CreateGame(void){
     G8RTOS_InitSemaphore(&lcd_SPI, 1);
 
     // Wifi mutex
-//    G8RTOS_InitSemaphore(&WiFi_mutex, 1); // can I move this to the other semaphore init area
+    G8RTOS_InitSemaphore(&WiFi_mutex, 1); // can I move this to the other semaphore init area
 
     // Add threads: GenerateBall, DrawObjects, ReadJoystickHost, SendDataToClient,ReceiveDataFromClient, MoveLEDs(lower priority), Idle
     G8RTOS_AddThread(idle_thread, 254, "idle");
@@ -491,8 +450,8 @@ extern void CreateGame(void){
 //    G8RTOS_AddThread(GenerateBall, 1, "GenBall");
     G8RTOS_AddThread(DrawObjects, 1, "DrawObj");
     G8RTOS_AddThread(ReadJoystickHost, 1, "JoyHost");
-//    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
-//    G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
+    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
+    G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
 
     P4DIR &= ~(BIT4 ); // Set P4 as input
     P4IFG &= ~(BIT4 ); // P4.0 IFG cleared
@@ -514,10 +473,10 @@ extern void ReadJoystickHost(void){
     int16_t displacement_x = 0;
     int16_t displacement_y = 0;
     while(1){
-        GetJoystickCoordinates(&joystick_host_x_coor, &joystick_host_y_coor);
+        GetJoystickCoordinates(&joystick_host_x_coor, &joystick_client_y_coor);
         // do we need to bias the value?
         displacement_x = joystick_host_x_coor / -4096;
-        displacement_y = joystick_host_y_coor / 4096;
+        displacement_y = joystick_client_y_coor / 4096;
 
 //        if(joystick_host_x_coor > 8000)
 //        {
@@ -563,10 +522,10 @@ extern void ReadJoystickHost(void){
             }
         }
 
-        joystick_thread_end:
         game_state.players[0].x += displacement_x; // update player 0 who is the host players is part of game state struct
         game_state.players[0].y += displacement_y;
-        game_state.players[1].x += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
+        game_state.players[1].x += client_displacement_x; // update player 1 simultaneously to guarantee paddle move speed
+        game_state.players[1].y += client_displacement_y; // update player 1 simultaneously to guarantee paddle move speed
 
         sleep(10);
     }
@@ -580,7 +539,7 @@ void GenerateBall() {
         {
             game_state.numberOfBalls++;
             // add the thread to the scheduler
-            test = G8RTOS_AddThread(MoveBall, 1, "MoveBall");
+            test = G8RTOS_AddThread(MoveBall_host, 1, "MoveBall_host");
         }
         // Sleeps proportional to the number of ball currently in play
         sleep(1024 * game_state.numberOfBalls);
@@ -588,7 +547,7 @@ void GenerateBall() {
     }
 }
 
-void MoveBall() {
+void MoveBall_host() {
     uint_fast8_t ball_index;
     uint_fast8_t player_origin_index = 0; // TODO: replace this hard-coding
     int16_t velocity_x = 0;
@@ -616,52 +575,52 @@ void MoveBall() {
 
     // Start with random velocity
 
-    if(joystick_host_x_coor < -4000 && joystick_host_y_coor > 4000) // up right
+    if(joystick_host_x_coor < -4000 && joystick_client_y_coor > 4000) // up right
     {
         velocity_x = MAX_BALL_SPEED;
         velocity_y = MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor > 4000) // up left
+    else if(joystick_host_x_coor > 4000 && joystick_client_y_coor > 4000) // up left
     {
         velocity_x = -MAX_BALL_SPEED;
         velocity_y = MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor < -4000 && joystick_host_y_coor < -4000) // down right
+    else if(joystick_host_x_coor < -4000 && joystick_client_y_coor < -4000) // down right
     {
         velocity_x = MAX_BALL_SPEED;
         velocity_y = -MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor < -4000) // down left
+    else if(joystick_host_x_coor > 4000 && joystick_client_y_coor < -4000) // down left
     {
         velocity_x = -MAX_BALL_SPEED;
         velocity_y = -MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor < -4000 && joystick_host_y_coor < 1000) // right
+    else if(joystick_host_x_coor < -4000 && joystick_client_y_coor < 1000) // right
     {
         velocity_x = MAX_BALL_SPEED;
         velocity_y = 0;
     }
-    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor < 1000) // left
+    else if(joystick_host_x_coor > 4000 && joystick_client_y_coor < 1000) // left
     {
         velocity_x = -MAX_BALL_SPEED;
         velocity_y = 0;
     }
-    else if(joystick_host_x_coor < 1000 && joystick_host_y_coor > 4000) // up
+    else if(joystick_host_x_coor < 1000 && joystick_client_y_coor > 4000) // up
     {
         velocity_x = 0;
         velocity_y = MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor < 1000 && joystick_host_y_coor < -4000) // down
+    else if(joystick_host_x_coor < 1000 && joystick_client_y_coor < -4000) // down
     {
         velocity_x = 0;
         velocity_y = -MAX_BALL_SPEED;
     }
 
-//    if(joystick_host_x_coor > 8000 && joystick_host_y_coor < 8000)
+//    if(joystick_host_x_coor > 8000 && joystick_client_y_coor < 8000)
 //    {
 //        velocity_x = -MAX_BALL_SPEED;
 //    }
-//    if(joystick_host_y_coor < 8000 && joystick_host_y_coor > 8000)
+//    if(joystick_client_y_coor < 8000 && joystick_client_y_coor > 8000)
 //    {
 //        velocity_y = -MAX_BALL_SPEED;
 //    }
@@ -684,8 +643,6 @@ void MoveBall() {
         static int16_t predictedCenterX = 0;
         static int16_t predictedCenterY = 0;
         static bool collision_predicted = false;
-
-        bool wall_collision_already_detected = false; // used for catching simultaneous paddle & wall collisions
 
         // WARNING: Assumes ball size of 4
         Point position = {game_state.balls[ball_index].currentCenterX,
@@ -888,6 +845,98 @@ void MoveBall() {
     }
 }
 
+void MoveBall_client() {
+    uint_fast8_t ball_index;
+    int16_t velocity_x = 0;
+    int16_t velocity_y = 0;
+    for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
+    {
+        if(game_state.balls[ball_index].alive == false)
+            break;
+    }
+    // debug code to check for error, shouldn't get stuck here
+    if(ball_index == MAX_NUM_OF_BALLS)
+//        G8RTOS_KillSelf();
+        while(1);
+
+    // designate this ball will be alive
+    game_state.balls[ball_index].alive = true;
+
+    game_state.balls[ball_index].color = LCD_WHITE;
+
+    game_state.balls[ball_index].currentCenterX = game_state.players[1].x + PLAYER_LEN_D2;
+    game_state.balls[ball_index].currentCenterY = game_state.players[1].y + PLAYER_WID_D2;
+
+    if(client_new_ball_dir == BALL_UP_RIGHT) // up right
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = MAX_BALL_SPEED;
+    }
+    else if(client_new_ball_dir == BALL_UP_LEFT) // up left
+    {
+        velocity_x = -MAX_BALL_SPEED;
+        velocity_y = MAX_BALL_SPEED;
+    }
+    else if(client_new_ball_dir == BALL_DOWN_RIGHT) // down right
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = -MAX_BALL_SPEED;
+    }
+    else if(client_new_ball_dir == BALL_DOWN_LEFT) // down left
+    {
+        velocity_x = -MAX_BALL_SPEED;
+        velocity_y = -MAX_BALL_SPEED;
+    }
+    else if(client_new_ball_dir == BALL_RIGHT) // right
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = 0;
+    }
+    else if(client_new_ball_dir == BALL_LEFT) // left
+    {
+        velocity_x = -MAX_BALL_SPEED;
+        velocity_y = 0;
+    }
+    else if(client_new_ball_dir == BALL_UP) // up
+    {
+        velocity_x = 0;
+        velocity_y = MAX_BALL_SPEED;
+    }
+    else if(client_new_ball_dir == BALL_DOWN) // down
+    {
+        velocity_x = 0;
+        velocity_y = -MAX_BALL_SPEED;
+    }
+    else
+    {
+        velocity_x = 0;
+        velocity_y = 0;
+    }
+
+    while(1)
+    {
+        static int16_t predictedCenterX = 0;
+        static int16_t predictedCenterY = 0;
+        static bool collision_predicted = false;
+
+        if(collision_predicted)
+        {
+            game_state.balls[ball_index].currentCenterX = predictedCenterX;
+            game_state.balls[ball_index].currentCenterY = predictedCenterY;
+
+            collision_predicted = false;
+        }
+        else
+        {
+//      Ball movement
+        game_state.balls[ball_index].currentCenterX += velocity_x;
+        game_state.balls[ball_index].currentCenterY += velocity_y;
+        }
+
+        sleep(35); //sleep for 35
+    }
+}
+
 void EndOfGameHost() {
     while(1)
     {
@@ -898,8 +947,6 @@ void EndOfGameHost() {
 
         // kill all other threads
         G8RTOS_KillAllOtherThreads();
-
-//        DrawScore(); // update the score bc a game was won
 
         // re-initialize semaphores
         G8RTOS_InitSemaphore(&WiFi_mutex, 1);
@@ -965,7 +1012,6 @@ void EndOfGameHost() {
 
             color_screen(BACK_COLOR); // clear arena with back color
             DrawBoundary();
-//            DrawScore();
             for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
             {
                 DrawPlayer(&(game_state.players[i])); // put the player at the center of the screen upon starting game
@@ -1133,7 +1179,15 @@ void ReceiveDataFromClient(void) {
         }
 //        uint32_t PRIMASK_state = StartCriticalSection();
         {
-            client_displacement = new_client_data.displacement; // update client player displacement received from the client
+            client_displacement_x = new_client_data.displacement_x; // update client player displacement received from the client
+            client_displacement_y = new_client_data.displacement_y; // update client player displacement received from the client
+
+            if(new_client_data.spawn_ball == true)
+            {
+                game_state.numberOfBalls++;
+                client_new_ball_dir = new_client_data.ball_direction;
+                test = G8RTOS_AddThread(MoveBall_client, 1, "MoveBall_client");
+            }
 
             extern uint_fast64_t num_packets_received;
             num_packets_received++;
@@ -1149,7 +1203,9 @@ void ReceiveDataFromClient(void) {
 extern void JoinGame(void) {
     // Set initial SpecificPlayerInfo_t strict attributes (you can get the IP address by calling getLocalIP()
     client_player.IP_address = GetClientIP();
-    client_player.displacement = 0;
+    client_player.displacement_x = 0;
+    client_player.displacement_y = 0;
+
     client_player.playerNumber = GetPlayerRole(); // TODO see if this works
     client_player.ready = true;
     client_player.joined = true;
@@ -1188,7 +1244,6 @@ extern void JoinGame(void) {
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
-    DrawScore();
 
     for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
     {
@@ -1218,39 +1273,80 @@ extern void JoinGame(void) {
     G8RTOS_AddThread(MoveLEDs, 1, "MoveLed");
     G8RTOS_AddThread(idle_thread, 254, "idle");
 
+    P4DIR &= ~(BIT4 ); // Set P4 as input
+    P4IFG &= ~(BIT4 ); // P4.0 IFG cleared
+    P4IE  |= BIT4 ;  // Enable interrupt on P4.0
+    P4IES |= BIT4 ;  // high-to-low transition
+    P4REN |= BIT4 ;  // Pull-up resistor
+    P4OUT |= BIT4 ;  // Sets res to pull-up
+
+    NVIC_EnableIRQ(PORT4_IRQn); // enable the interrupt
+    G8RTOS_AddAPeriodicEvent(fight_button_press, 1, PORT4_IRQn);
+
     G8RTOS_KillSelf();
     while(1);
 }
 
 extern void ReadJoystickClient(void){
-    int16_t displacement = 0;
+    int16_t displacement_x = 0;
+    int16_t displacement_y = 0;
+
     while(1)
     {
         GetJoystickCoordinates(&joystick_client_x_coor, &joystick_client_y_coor);
         // do we need to bias the value?
-
+        displacement_x = joystick_client_x_coor / -4096;
+        displacement_y = joystick_client_y_coor / 4096;
 // too fast, create instability
 //        displacement = joystick_client_x_coor / -4096;
 
-        if(joystick_client_x_coor > 8000)
+//        if(joystick_client_x_coor > 8000)
+//        {
+//            displacement = -1;
+//        }
+//        else if(joystick_client_x_coor > 100)
+//        {
+//            displacement = 0;
+//        }
+//        else if(joystick_client_x_coor > -1000)
+//        {
+//            displacement = 0;
+//        }
+//        else if(joystick_client_x_coor > -8000)
+//        {
+//            displacement = 1;
+//        }
+        collision_dir dir;
+        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
         {
-            displacement = -1;
+            Point player_position = {game_state.players[0].x,
+                                     game_state.players[0].y};
+            dir = check_collision(player_position,
+                                  PLAYER_LEN, PLAYER_WID,
+                                  displacement_x, displacement_y,
+                                  &stage_1[i]);
+            if(dir != none)
+            {
+                switch(dir)
+                {
+                case bottom:
+                case top:
+                    displacement_y = 0;
+                    break;
+                case left:
+                case right:
+                    displacement_x = 0;
+                    break;
+                default:
+                    break;
+                }
+            }
         }
-        else if(joystick_client_x_coor > 100)
-        {
-            displacement = 0;
-        }
-        else if(joystick_client_x_coor > -1000)
-        {
-            displacement = 0;
-        }
-        else if(joystick_client_x_coor > -8000)
-        {
-            displacement = 1;
-        }
+
         //should this go to self? or a pointer that decides what is client and host
 //        game_state.players[1].currentCenter += displacement; // update the game state
-        client_player.displacement = displacement; // also update the packet that will be sent over wifi
+        client_player.displacement_x = displacement_x; // also update the packet that will be sent over wifi
+        client_player.displacement_y = displacement_y; // also update the packet that will be sent over wifi
         sleep(10);
     }
 }
@@ -1271,6 +1367,11 @@ void SendDataToHost(){
             SendData((uint8_t *)&client_player, HOST_IP_ADDR,
                      sizeof(client_player));
 
+            // turn off the generate ball flag
+            if(client_player.spawn_ball == true)
+            {
+                client_player.spawn_ball = false;
+            }
             extern uint_fast64_t num_packets_sent;
             num_packets_sent++;
 
@@ -1302,7 +1403,7 @@ void ReceiveDataFromHost() {
             }
             G8RTOS_SignalSemaphore(&WiFi_mutex);
 
-            //sleep(1);
+            sleep(1);
         }
 
 //        uint32_t PRIMASK_state = StartCriticalSection();
@@ -1319,7 +1420,6 @@ void ReceiveDataFromHost() {
 //            if(game_state.overallScores[0] != gamestate_from_host.overallScores[0] || game_state.overallScores[1] != gamestate_from_host.overallScores[1])
 //            {
 //                // update game score global
-//                DrawScore();
 //            }
 
             game_state = gamestate_from_host;
@@ -1350,9 +1450,6 @@ void ReceiveDataFromHost() {
 void EndOfGameClient() {
     while(1) // TODO: Actually write code for end state
     {
-//            DrawScore();
-
-
         // wait for all semaphores to be released
             G8RTOS_WaitSemaphore(&WiFi_mutex);
 //            G8RTOS_WaitSemaphore(&led_mutex);
@@ -1379,7 +1476,8 @@ void EndOfGameClient() {
             if(game_state.winner == false && game_state.gameDone == false)
             {
                 // reset game variables
-                client_player.displacement = 0;
+                client_player.displacement_x = 0;
+                client_player.displacement_y = 0;
                 // draw init board (draw arena, players, and scores)
                 color_screen(BACK_COLOR); // clear arena with back color
                 DrawBoundary();
@@ -1440,8 +1538,59 @@ void fight_button_press(void){
         P4->IE &= ~(BIT4); // turn off interrupt
         fire_delay = true;
         test = G8RTOS_AddThread(FireWait, 1, "FireWait");
-        game_state.numberOfBalls++;
-        test = G8RTOS_AddThread(MoveBall, 1, "MoveBall");
+        if(GetPlayerRole() == Host)
+        {
+            game_state.numberOfBalls++;
+            test = G8RTOS_AddThread(MoveBall_host, 1, "MoveBall_host");
+        }
+        else
+        {
+            client_player.spawn_ball = true;
+            if(joystick_client_x_coor < -4000 && joystick_client_y_coor > 4000) // up right
+            {
+                client_player.ball_direction = BALL_UP_RIGHT;
+
+            }
+            else if(joystick_client_x_coor > 4000 && joystick_client_y_coor > 4000) // up left
+            {
+                client_player.ball_direction = BALL_UP_LEFT;
+
+            }
+            else if(joystick_client_x_coor < -4000 && joystick_client_y_coor < -4000) // down right
+            {
+                client_player.ball_direction = BALL_DOWN_RIGHT;
+
+            }
+            else if(joystick_client_x_coor > 4000 && joystick_client_y_coor < -4000) // down left
+            {
+                client_player.ball_direction = BALL_DOWN_LEFT;
+
+            }
+            else if(joystick_client_x_coor < -4000 && joystick_client_y_coor < 1000) // right
+            {
+                client_player.ball_direction = BALL_RIGHT;
+
+            }
+            else if(joystick_client_x_coor > 4000 && joystick_client_y_coor < 1000) // left
+            {
+                client_player.ball_direction = BALL_LEFT;
+
+            }
+            else if(joystick_client_x_coor < 1000 && joystick_client_y_coor > 4000) // up
+            {
+                client_player.ball_direction = BALL_UP;
+
+            }
+            else if(joystick_client_x_coor < 1000 && joystick_client_y_coor < -4000) // down
+            {
+                client_player.ball_direction = BALL_DOWN;
+            }
+            else
+            {
+                client_player.ball_direction = BALL_none;
+            }
+
+        }
     }
     P4->IFG &= ~(BIT4); // clear flag
 

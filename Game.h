@@ -133,6 +133,9 @@ typedef enum
     QUIT = 2
 }endGameAction;
 
+typedef enum {BALL_none, BALL_UP_RIGHT, BALL_UP_LEFT, BALL_DOWN_RIGHT, BALL_DOWN_LEFT, BALL_RIGHT, BALL_LEFT, BALL_UP, BALL_DOWN} ball_dir;
+
+
 /*********************************************** Global Defines ********************************************************************/
 
 /*********************************************** Data Structures ********************************************************************/
@@ -143,11 +146,14 @@ typedef enum
 typedef struct
 {
     uint32_t IP_address;
-    int16_t displacement;
+    int16_t displacement_x;
+    int16_t displacement_y;
     uint8_t playerNumber;
+    ball_dir ball_direction;
     bool ready;
     bool joined;
     bool acknowledge;
+    bool spawn_ball;
 } SpecificPlayerInfo_t;
 
 /*
@@ -268,7 +274,8 @@ void ReadJoystickHost();
 /*
  * Thread to move a single ball
  */
-void MoveBall();
+void MoveBall_host();
+void MoveBall_client();
 
 /*
  * End of game for the host
