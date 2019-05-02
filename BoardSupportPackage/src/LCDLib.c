@@ -224,7 +224,7 @@ void LCD_Draw_Textured_Block(int16_t xStart, int16_t xEnd, int16_t yStart,
 void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t *color_array)
 {
     static uint_fast8_t frame_num = 0;
-    if(frame_num >= 8)
+    if(frame_num >= 16)
         frame_num = 0;
     // Optimization complexity: O(64 + 2N) Bytes Written
 
@@ -258,7 +258,7 @@ void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd,
     SPISendRecvByte(SPI_START | SPI_WR | SPI_DATA); // start condition   /* Write : RS = 1, RW = 0       */
     for(uint16_t i=xStart; i<xEnd; i++){
         for(uint16_t j=yStart; j<yEnd; j++){
-            LCD_Write_Data_Only(*(color_array+(frame_num/2 * FIGHTER_CAT_SPRITE_SIZE)));
+            LCD_Write_Data_Only(*(color_array+(frame_num/4 * FIGHTER_CAT_SPRITE_SIZE)));
             color_array++;
         }
     }

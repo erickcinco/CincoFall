@@ -473,10 +473,10 @@ extern void ReadJoystickHost(void){
     int16_t displacement_x = 0;
     int16_t displacement_y = 0;
     while(1){
-        GetJoystickCoordinates(&joystick_host_x_coor, &joystick_client_y_coor);
+        GetJoystickCoordinates(&joystick_host_x_coor, &joystick_host_y_coor);
         // do we need to bias the value?
         displacement_x = joystick_host_x_coor / -4096;
-        displacement_y = joystick_client_y_coor / 4096;
+        displacement_y = joystick_host_y_coor / 4096;
 
 //        if(joystick_host_x_coor > 8000)
 //        {
@@ -524,6 +524,33 @@ extern void ReadJoystickHost(void){
 
         game_state.players[0].x += displacement_x; // update player 0 who is the host players is part of game state struct
         game_state.players[0].y += displacement_y;
+
+        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+        {
+            Point player_position = {game_state.players[1].x - WIGGLE_ROOM,
+                                     game_state.players[1].y - 2*WIGGLE_ROOM};
+            dir = check_collision(player_position,
+                                  PLAYER_LEN+2*WIGGLE_ROOM, PLAYER_WID+4*WIGGLE_ROOM,
+                                  client_displacement_x, client_displacement_y,
+                                  &stage_1[i]);
+            if(dir != none)
+            {
+                switch(dir)
+                {
+                case bottom:
+                case top:
+                    client_displacement_y = 0;
+                    break;
+                case left:
+                case right:
+                    client_displacement_x = 0;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
         game_state.players[1].x += client_displacement_x; // update player 1 simultaneously to guarantee paddle move speed
         game_state.players[1].y += client_displacement_y; // update player 1 simultaneously to guarantee paddle move speed
 
@@ -1316,32 +1343,32 @@ extern void ReadJoystickClient(void){
 //        {
 //            displacement = 1;
 //        }
-        collision_dir dir;
-        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
-        {
-            Point player_position = {game_state.players[0].x,
-                                     game_state.players[0].y};
-            dir = check_collision(player_position,
-                                  PLAYER_LEN, PLAYER_WID,
-                                  displacement_x, displacement_y,
-                                  &stage_1[i]);
-            if(dir != none)
-            {
-                switch(dir)
-                {
-                case bottom:
-                case top:
-                    displacement_y = 0;
-                    break;
-                case left:
-                case right:
-                    displacement_x = 0;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
+//        collision_dir dir;
+//        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+//        {
+//            Point player_position = {game_state.players[0].x,
+//                                     game_state.players[0].y};
+//            dir = check_collision(player_position,
+//                                  PLAYER_LEN, PLAYER_WID,
+//                                  displacement_x, displacement_y,
+//                                  &stage_1[i]);
+//            if(dir != none)
+//            {
+//                switch(dir)
+//                {
+//                case bottom:
+//                case top:
+//                    displacement_y = 0;
+//                    break;
+//                case left:
+//                case right:
+//                    displacement_x = 0;
+//                    break;
+//                default:
+//                    break;
+//                }
+//            }
+//        }
 
         //should this go to self? or a pointer that decides what is client and host
 //        game_state.players[1].currentCenter += displacement; // update the game state
