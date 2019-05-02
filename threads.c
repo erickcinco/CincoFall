@@ -567,9 +567,8 @@ void MoveBall() {
             break;
     }
     // debug code to check for error, shouldn't get stuck here
-    if(ball_index == MAX_NUM_OF_BALLS)
-//        G8RTOS_KillSelf();
-        while(1);
+    if(ball_index >= MAX_NUM_OF_BALLS)
+        G8RTOS_KillSelf();
 
     // designate this ball will be alive
     game_state.balls[ball_index].alive = true;
@@ -644,27 +643,48 @@ void MoveBall() {
 
     while(1)
     {
+        if(game_state.balls[ball_index].kill_me == true)
+        {
+            G8RTOS_KillSelf();
+            while(1);
+        }
         static int16_t predictedCenterX = 0;
         static int16_t predictedCenterY = 0;
         static bool collision_predicted = false;
 
         bool wall_collision_already_detected = false; // used for catching simultaneous paddle & wall collisions
 
-        if(collision_predicted)
-        {
-            game_state.balls[ball_index].currentCenterX = predictedCenterX;
-            game_state.balls[ball_index].currentCenterY = predictedCenterY;
+        // WARNING: Assumes ball size of 4
+        Point position = {game_state.balls[ball_index].currentCenterX,
+                          game_state.balls[ball_index].currentCenterY};
 
-            collision_predicted = false;
-        }
-        else
+        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
         {
-//      Ball movement
+            collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &stage_1[i]);
+
+            if(dir != none)
+            {
+                game_state.balls[ball_index].kill_me = true;
+                goto ball_sleep;
+            }
+        }
+
+
+//        if(collision_predicted)
+//        {
+//            game_state.balls[ball_index].currentCenterX = predictedCenterX;
+//            game_state.balls[ball_index].currentCenterY = predictedCenterY;
+//
+//            collision_predicted = false;
+//        }
+//        else
+//        {
+////      Ball movement
         game_state.balls[ball_index].currentCenterX += velocity_x;
 //        game_state.balls[ball_index].currentCenterX %= MAX_SCREEN_X;
         game_state.balls[ball_index].currentCenterY += velocity_y;
 //        game_state.balls[ball_index].currentCenterY %= MAX_SCREEN_Y;
-        }
+//        }
 
         // Collision checking
 
@@ -800,7 +820,7 @@ void MoveBall() {
 //                while(1);
 //            }
 //        }
-
+        ball_sleep:
         sleep(35); //sleep for 35
     }
 }
