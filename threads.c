@@ -411,7 +411,7 @@ extern void CreateGame(void){
     G8RTOS_InitSemaphore(&lcd_SPI, 1);
 
     // Wifi mutex
-//    G8RTOS_InitSemaphore(&WiFi_mutex, 1); // can I move this to the other semaphore init area
+    G8RTOS_InitSemaphore(&WiFi_mutex, 1); // can I move this to the other semaphore init area
 
     // Add threads: GenerateBall, DrawObjects, ReadJoystickHost, SendDataToClient,ReceiveDataFromClient, MoveLEDs(lower priority), Idle
     G8RTOS_AddThread(idle_thread, 254, "idle");
@@ -1334,7 +1334,7 @@ void ReceiveDataFromHost() {
             }
             G8RTOS_SignalSemaphore(&WiFi_mutex);
 
-            //sleep(1);
+            sleep(1);
         }
 
 //        uint32_t PRIMASK_state = StartCriticalSection();

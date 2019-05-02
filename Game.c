@@ -62,7 +62,7 @@ void AcquirePlayerRole() {
     }
     LCD_Clear(BACK_COLOR);
 
-//    initCC3100(player_role);
+    initCC3100(player_role);
     // Need to send data immediately afterwards to get the board working
     // properly any time after this.
     uint8_t junk = 0xff;
@@ -76,12 +76,12 @@ void AcquirePlayerRole() {
         client_IP = getLocalIP();
     }
 
-//    uint32_t local_IP = getLocalIP();
-//    char ip_addr[16];
-//    sprintf(ip_addr, "%d.%d.%d.%d", local_IP>>24 & 0xff, local_IP>>16 & 0xff,
-//            local_IP>>8 & 0xff, local_IP & 0xff);
-//
-//    LCD_Text(2, 18, ip_addr, LCD_WHITE);
+    uint32_t local_IP = getLocalIP();
+    char ip_addr[16];
+    sprintf(ip_addr, "%d.%d.%d.%d", local_IP>>24 & 0xff, local_IP>>16 & 0xff,
+            local_IP>>8 & 0xff, local_IP & 0xff);
+
+    LCD_Text(2, 18, ip_addr, LCD_WHITE);
     Delay(1500);
 
     LCD_Clear(BACK_COLOR);
