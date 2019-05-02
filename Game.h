@@ -36,10 +36,10 @@
 #define NUM_OF_PLAYERS_PLAYING 2
 
 /* Size of game arena */
-#define ARENA_MIN_X                  40
-#define ARENA_MAX_X                  280
-#define ARENA_MIN_Y                  0
-#define ARENA_MAX_Y                  240
+#define ARENA_MIN_X                  TEXTURE_SIZE
+#define ARENA_MAX_X                  MAX_SCREEN_X - TEXTURE_SIZE
+#define ARENA_MIN_Y                  TEXTURE_SIZE
+#define ARENA_MAX_Y                  MAX_SCREEN_Y - TEXTURE_SIZE
 
 /* Size of objects */
 #define PADDLE_LEN                   64

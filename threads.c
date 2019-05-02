@@ -424,7 +424,7 @@ extern void CreateGame(void){
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
-    DrawScore();
+//    DrawScore();
     for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
     {
         DrawPlayer(&(game_state.players[i])); // put the player at the center of the screen upon starting game
