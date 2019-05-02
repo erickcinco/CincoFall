@@ -127,8 +127,8 @@ void DrawBoundary(void){
 }
 
 void DrawPlayer(GeneralPlayerInfo_t * player){
-    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
-    int16_t y_end = ARENA_MAX_Y;
+    int16_t y_start = player->y;
+    int16_t y_end = player->y + PLAYER_WID;
     int16_t x_start = player->x;
     int16_t x_end = player->x + PLAYER_LEN;
 
@@ -170,7 +170,9 @@ void DrawObjects(void){
     PrevPlayer_t prev_red_x;
     PrevPlayer_t prev_blue_x;
     prev_red_x.x = game_state.players[1].x;
+    prev_red_x.y = game_state.players[1].y;
     prev_blue_x.x = game_state.players[0].x;
+    prev_blue_x.y = game_state.players[0].y;
     PrevBall_t prev_ball_array[MAX_NUM_OF_BALLS];
 
     // Init prev ball array
@@ -239,22 +241,28 @@ void DrawObjects(void){
         }
 
         // update paddles
-        if(game_state.players[1].x != prev_red_x.x){
+        if((game_state.players[1].x != prev_red_x.x) ||
+           (game_state.players[1].y != prev_red_x.y))
+        {
             UpdatePlayerOnScreen(&prev_red_x, &(game_state.players[1]));
         }
-        if(game_state.players[0].x != prev_blue_x.x){
+        if((game_state.players[0].x != prev_blue_x.x) ||
+           (game_state.players[0].y != prev_blue_x.y))
+        {
             UpdatePlayerOnScreen(&prev_blue_x, &(game_state.players[0]));
         }
         prev_red_x.x = game_state.players[1].x;
+        prev_red_x.y = game_state.players[1].y;
         prev_blue_x.x = game_state.players[0].x;
+        prev_blue_x.y = game_state.players[0].y;
         sleep(20); // sleep for 20ms (reasonable refresh rate)
     }
 }
 
 void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * outPlayer){
     // only update if new center is different than past center
-    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
-    int16_t y_end = ARENA_MAX_Y;
+    int16_t y_start = (prevPlayerIn->y);
+    int16_t y_end = prevPlayerIn->y + PLAYER_WID;
     int16_t x_old_start = (prevPlayerIn->x);
     int16_t x_old_end = (prevPlayerIn->x) + PLAYER_LEN;
     int16_t x_new_start = (outPlayer->x);
