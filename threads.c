@@ -1406,7 +1406,7 @@ extern void ReadJoystickClient(void){
         game_state.players[1].x += displacement_x;
         game_state.players[1].y += displacement_y;
 
-        sleep(5);
+        sleep(10);
     }
 }
 
