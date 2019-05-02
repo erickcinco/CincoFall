@@ -884,8 +884,8 @@ void MoveBall_client() {
             break;
     }
     // debug code to check for error, shouldn't get stuck here
-    if(ball_index == MAX_NUM_OF_BALLS)
-//        G8RTOS_KillSelf();
+    if(ball_index >= MAX_NUM_OF_BALLS)
+        G8RTOS_KillSelf();
         while(1);
 
     // designate this ball will be alive
@@ -1403,10 +1403,10 @@ extern void ReadJoystickClient(void){
         client_player.displacement_x = displacement_x; // also update the packet that will be sent over wifi
         client_player.displacement_y = displacement_y; // also update the packet that will be sent over wifi
 
-        game_state.players[1].x = displacement_x;
-        game_state.players[1].y = displacement_y;
+        game_state.players[1].x += displacement_x;
+        game_state.players[1].y += displacement_y;
 
-        sleep(10);
+        sleep(5);
     }
 }
 
