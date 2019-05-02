@@ -4,13 +4,11 @@
 #include "cc3100_usage.h"
 #include "Game.h"
 #include <driverlib.h>
-#include <BSP.h>
 #include <core_cm4.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "fighter_cat_gif_color_array_no_background.h"
+//#include "fighter_cat_gif_color_array.h"
 #include "G8RTOS.h"
 
-#include "fighter_cat_gif_color_array.h"
 
 //#include "cat_color_array.h"
 //#include "parrot_color_array.h"
@@ -38,10 +36,10 @@ void main(void) {
         Delay(REFRESH);
         LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_6);
         Delay(REFRESH);
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_7);
-        Delay(REFRESH);
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_8);
-        Delay(REFRESH);
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_7);
+//        Delay(REFRESH);
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_8);
+//        Delay(REFRESH);
     }
 
 //

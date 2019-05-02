@@ -218,9 +218,10 @@ void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd,
     SPI_CS_LOW; // set chip select upon start
     SPISendRecvByte(SPI_START | SPI_WR | SPI_DATA); // start condition   /* Write : RS = 1, RW = 0       */
     for(uint16_t i=xStart; i<xEnd; i++){
-        for(uint16_t i=yStart; i<yEnd; i++){
+        for(uint16_t j=yStart; j<yEnd; j++){
             LCD_Write_Data_Only(*color_array);
-            color_array++;
+                color_array++;
+
         }
     }
     SPI_CS_HIGH;
