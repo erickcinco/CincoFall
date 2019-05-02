@@ -530,8 +530,8 @@ void GenerateBall() {
 
 void MoveBall() {
     uint_fast8_t ball_index;
-    int16_t velocity_x = MAX_BALL_SPEED;
-    int16_t velocity_y = MAX_BALL_SPEED;
+    int16_t velocity_x = 0;
+    int16_t velocity_y = 0;
     for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
     {
         if(game_state.balls[ball_index].alive == false)
@@ -547,22 +547,65 @@ void MoveBall() {
 
     game_state.balls[ball_index].color = LCD_WHITE;
 
-    game_state.balls[ball_index].currentCenterX = game_state.players[0].x+PLAYER_LEN_D2;
+    game_state.balls[ball_index].currentCenterX = game_state.players[0].x + PLAYER_LEN_D2;
 //            (rand() % (HORIZ_CENTER_MAX_BALL - HORIZ_CENTER_MIN_BALL)) +
 //            HORIZ_CENTER_MIN_BALL;
-    game_state.balls[ball_index].currentCenterY = game_state.players[0].y-PLAYER_WID_D2;
+    game_state.balls[ball_index].currentCenterY = game_state.players[0].y + PLAYER_WID_D2;
 //            (rand() % (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)) +
 //            VERT_CENTER_MIN_BALL;
 
     // Start with random velocity
-    if(joystick_host_x_coor < 0)
+
+    if(joystick_host_x_coor < -4000 && joystick_host_y_coor > 4000) // up right
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = MAX_BALL_SPEED;
+    }
+    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor > 4000) // up left
     {
         velocity_x = -MAX_BALL_SPEED;
+        velocity_y = MAX_BALL_SPEED;
     }
-    if(joystick_host_y_coor < 0)
+    else if(joystick_host_x_coor < -4000 && joystick_host_y_coor < -4000) // down right
     {
+        velocity_x = MAX_BALL_SPEED;
         velocity_y = -MAX_BALL_SPEED;
     }
+    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor < -4000) // down left
+    {
+        velocity_x = -MAX_BALL_SPEED;
+        velocity_y = -MAX_BALL_SPEED;
+    }
+    else if(joystick_host_x_coor < -4000 && joystick_host_y_coor < 1000) // right
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = 0;
+    }
+    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor < 1000) // left
+    {
+        velocity_x = -MAX_BALL_SPEED;
+        velocity_y = 0;
+    }
+    else if(joystick_host_x_coor < 1000 && joystick_host_y_coor > 4000) // up
+    {
+        velocity_x = 0;
+        velocity_y = MAX_BALL_SPEED;
+    }
+    else if(joystick_host_x_coor < 1000 && joystick_host_y_coor < -4000) // down
+    {
+        velocity_x = 0;
+        velocity_y = -MAX_BALL_SPEED;
+    }
+
+//    if(joystick_host_x_coor > 8000 && joystick_host_y_coor < 8000)
+//    {
+//        velocity_x = -MAX_BALL_SPEED;
+//    }
+//    if(joystick_host_y_coor < 8000 && joystick_host_y_coor > 8000)
+//    {
+//        velocity_y = -MAX_BALL_SPEED;
+//    }
+
 //    if(velocity_x == 0){
 //        velocity_x++;
 //    }
