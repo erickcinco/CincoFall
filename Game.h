@@ -133,6 +133,7 @@ typedef enum
     QUIT = 2
 }endGameAction;
 
+
 typedef enum {BALL_none, BALL_UP_RIGHT, BALL_UP_LEFT, BALL_DOWN_RIGHT, BALL_DOWN_LEFT, BALL_RIGHT, BALL_LEFT, BALL_UP, BALL_DOWN} ball_dir;
 
 
