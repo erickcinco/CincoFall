@@ -98,7 +98,7 @@
 #define VERT_CENTER_MIN_BALL         (ARENA_MIN_Y + BALL_SIZE_D2)
 
 /* Maximum ball speed */
-#define MAX_BALL_SPEED               6
+#define MAX_BALL_SPEED               5
 
 /* Background color - Black */
 #define BACK_COLOR                   LCD_BLACK
