@@ -47,6 +47,7 @@ static SpecificPlayerInfo_t new_client_data;
 static SpecificPlayerInfo_t client_player;
 
 int16_t client_displacement; // global variable for host
+bool fire_delay = false;
 
 char display_score_buffer_0[10];
 char display_score_buffer_1[10];
@@ -454,6 +455,17 @@ extern void CreateGame(void){
 //    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
 //    G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
 
+    P4DIR &= ~(BIT4 ); // Set P4 as input
+    P4IFG &= ~(BIT4 ); // P4.0 IFG cleared
+    P4IE  |= BIT4 ;  // Enable interrupt on P4.0
+    P4IES |= BIT4 ;  // high-to-low transition
+    P4REN |= BIT4 ;  // Pull-up resistor
+    P4OUT |= BIT4 ;  // Sets res to pull-up
+
+    NVIC_EnableIRQ(PORT4_IRQn); // enable the interrupt
+    G8RTOS_AddAPeriodicEvent(fight_button_press, 1, PORT4_IRQn);
+
+
     // Kill self
     G8RTOS_KillSelf();
     while(1);
@@ -514,6 +526,7 @@ void MoveBall() {
     }
     // debug code to check for error, shouldn't get stuck here
     if(ball_index == MAX_NUM_OF_BALLS)
+//        G8RTOS_KillSelf();
         while(1);
 
     // designate this ball will be alive
@@ -1248,6 +1261,29 @@ void client_end_game_screen(){
 }
 
 
+void fight_button_press(void){
+
+    if(P4->IFG & BIT4 && fire_delay == false)
+    {
+        P4->IE &= ~(BIT4); // turn off interrupt
+        fire_delay = true;
+        test = G8RTOS_AddThread(FireWait, 1, "FireWait");
+        game_state.numberOfBalls++;
+        test = G8RTOS_AddThread(MoveBall, 1, "MoveBall");
+    }
+    P4->IFG &= ~(BIT4); // clear flag
+
+}
+
+void FireWait(void){
+    while(1){
+        sleep(300);
+        P4->IE |= BIT4; // renable interrupt
+        sleep(1);
+        fire_delay = false;
+        G8RTOS_KillSelf();
+    }
+}
 
 void end_game_button_press(void) {
     if(check_end_game_buttons)
