@@ -13,7 +13,7 @@
 #include <stdbool.h>
 #include "game.h"
 
-static uint16_t test_texture[TEXTURE_SIZE * TEXTURE_SIZE] = {
+static uint16_t border_texture[TEXTURE_SIZE * TEXTURE_SIZE] = {
     LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,
     LCD_BLACK,   LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_BLACK,
     LCD_BLACK,   LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_PURPLE,  LCD_BLACK,
@@ -32,6 +32,25 @@ static uint16_t test_texture[TEXTURE_SIZE * TEXTURE_SIZE] = {
     LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK,   LCD_BLACK
 };
 
+static uint16_t box_texture[TEXTURE_SIZE * TEXTURE_SIZE] = {
+    LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,
+    LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,
+    LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY,    LCD_GREEN,
+    LCD_GRAY,    LCD_GRAY,    LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GREEN,   LCD_GRAY,    LCD_GRAY
+};
+
 typedef struct stage_piece {
     int16_t x;
     int16_t y;
@@ -44,15 +63,15 @@ typedef struct stage_piece {
 typedef enum {none, left, right, top, bottom} collision_dir;
 
 static stage_piece_t stage_1[] = {
-                           {0, 0, 16, MAX_SCREEN_X, test_texture}, // left border
-                           {MAX_SCREEN_X-16, 0, 16, MAX_SCREEN_X, test_texture}, // right border
-                           {16, 0, MAX_SCREEN_X-16-16, 16, test_texture}, // top border
-                           {16, MAX_SCREEN_Y-16, MAX_SCREEN_X-16-16, 16, test_texture}, // bottom border
-                           {64, 64, 32, 32, test_texture}, // upper left block
-                           {MAX_SCREEN_X-64-32, 64, 32, 32, test_texture}, // upper right block
-                           {64, MAX_SCREEN_Y-64-32, 32, 32, test_texture}, // lower left block
-                           {MAX_SCREEN_X-64-32, MAX_SCREEN_Y-64-32, 32, 32, test_texture}, // lower right block
-                           {MAX_SCREEN_X/2 - 32/2, MAX_SCREEN_Y/2 - 32/2, 32, 32, test_texture}
+                           {0, 0, 16, MAX_SCREEN_X, border_texture}, // left border
+                           {MAX_SCREEN_X-16, 0, 16, MAX_SCREEN_X, border_texture}, // right border
+                           {16, 0, MAX_SCREEN_X-16-16, 16, border_texture}, // top border
+                           {16, MAX_SCREEN_Y-16, MAX_SCREEN_X-16-16, 16, border_texture}, // bottom border
+                           {64, 64, 32, 32, box_texture}, // upper left block
+                           {MAX_SCREEN_X-64-32, 64, 32, 32, box_texture}, // upper right block
+                           {64, MAX_SCREEN_Y-64-32, 32, 32, box_texture}, // lower left block
+                           {MAX_SCREEN_X-64-32, MAX_SCREEN_Y-64-32, 32, 32, box_texture}, // lower right block
+                           {MAX_SCREEN_X/2 - 32/2, MAX_SCREEN_Y/2 - 32/2, 32, 32, box_texture}
 };
 
 void draw_stage_piece(stage_piece_t * stage_piece);
