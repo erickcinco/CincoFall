@@ -47,6 +47,7 @@ static SpecificPlayerInfo_t new_client_data;
 static SpecificPlayerInfo_t client_player;
 
 int16_t client_displacement; // global variable for host
+bool fire_delay = false;
 
 char display_score_buffer_0[10];
 char display_score_buffer_1[10];
@@ -462,6 +463,17 @@ extern void CreateGame(void){
 //    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
 //    G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
 
+    P4DIR &= ~(BIT4 ); // Set P4 as input
+    P4IFG &= ~(BIT4 ); // P4.0 IFG cleared
+    P4IE  |= BIT4 ;  // Enable interrupt on P4.0
+    P4IES |= BIT4 ;  // high-to-low transition
+    P4REN |= BIT4 ;  // Pull-up resistor
+    P4OUT |= BIT4 ;  // Sets res to pull-up
+
+    NVIC_EnableIRQ(PORT4_IRQn); // enable the interrupt
+    G8RTOS_AddAPeriodicEvent(fight_button_press, 1, PORT4_IRQn);
+
+
     // Kill self
     G8RTOS_KillSelf();
     while(1);
@@ -518,6 +530,8 @@ void GenerateBall() {
 
 void MoveBall() {
     uint_fast8_t ball_index;
+    int16_t velocity_x = MAX_BALL_SPEED;
+    int16_t velocity_y = MAX_BALL_SPEED;
     for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
     {
         if(game_state.balls[ball_index].alive == false)
@@ -525,6 +539,7 @@ void MoveBall() {
     }
     // debug code to check for error, shouldn't get stuck here
     if(ball_index == MAX_NUM_OF_BALLS)
+//        G8RTOS_KillSelf();
         while(1);
 
     // designate this ball will be alive
@@ -532,23 +547,28 @@ void MoveBall() {
 
     game_state.balls[ball_index].color = LCD_WHITE;
 
-    game_state.balls[ball_index].currentCenterX = MAX_SCREEN_X/2;
+    game_state.balls[ball_index].currentCenterX = game_state.players[0].x+PLAYER_LEN_D2;
 //            (rand() % (HORIZ_CENTER_MAX_BALL - HORIZ_CENTER_MIN_BALL)) +
 //            HORIZ_CENTER_MIN_BALL;
-    game_state.balls[ball_index].currentCenterY = (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)/2;
+    game_state.balls[ball_index].currentCenterY = game_state.players[0].y-PLAYER_WID_D2;
 //            (rand() % (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)) +
 //            VERT_CENTER_MIN_BALL;
 
     // Start with random velocity
-    int16_t velocity_x = ((rand() % MAX_BALL_SPEED * 2) - MAX_BALL_SPEED);
-    int16_t velocity_y = ((rand() % MAX_BALL_SPEED * 2) - MAX_BALL_SPEED);
-
-    if(velocity_x == 0){
-        velocity_x++;
+    if(joystick_host_x_coor < 0)
+    {
+        velocity_x = -MAX_BALL_SPEED;
     }
-    if(velocity_y == 0){
-        velocity_y++;
+    if(joystick_host_y_coor < 0)
+    {
+        velocity_y = -MAX_BALL_SPEED;
     }
+//    if(velocity_x == 0){
+//        velocity_x++;
+//    }
+//    if(velocity_y == 0){
+//        velocity_y++;
+//    }
 
     while(1)
     {
@@ -575,6 +595,7 @@ void MoveBall() {
         }
 
         // Collision checking
+
 //
 //        // left wall
 //        {
@@ -613,6 +634,7 @@ void MoveBall() {
 //        }
 //
 //        // paddle 0
+
 //        {
 //            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
 //            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
@@ -633,6 +655,7 @@ void MoveBall() {
 //                game_state.balls[ball_index].color = game_state.players[0].color;
 //            }
 //        }
+
 //
 //        // paddle 1
 //        {
@@ -654,6 +677,7 @@ void MoveBall() {
 //                game_state.balls[ball_index].color = game_state.players[1].color;
 //            }
 //        }
+
 //        // bottom wall
 //        {
 //            if(game_state.balls[ball_index].currentCenterY  > BOTTOM_PLAYER_CENTER_Y)// BOTTOM_PLAYER_CENTER_Y
@@ -678,6 +702,7 @@ void MoveBall() {
 //                while(1);
 //            }
 //        }
+
 //
 //        // top wall
 //        {
@@ -1261,6 +1286,29 @@ void client_end_game_screen(){
 }
 
 
+void fight_button_press(void){
+
+    if(P4->IFG & BIT4 && fire_delay == false)
+    {
+        P4->IE &= ~(BIT4); // turn off interrupt
+        fire_delay = true;
+        test = G8RTOS_AddThread(FireWait, 1, "FireWait");
+        game_state.numberOfBalls++;
+        test = G8RTOS_AddThread(MoveBall, 1, "MoveBall");
+    }
+    P4->IFG &= ~(BIT4); // clear flag
+
+}
+
+void FireWait(void){
+    while(1){
+        sleep(300);
+        P4->IE |= BIT4; // renable interrupt
+        sleep(1);
+        fire_delay = false;
+        G8RTOS_KillSelf();
+    }
+}
 
 void end_game_button_press(void) {
     if(check_end_game_buttons)

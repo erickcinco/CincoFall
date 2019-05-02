@@ -343,7 +343,8 @@ void client_end_game_screen();
 void quit_screen_host(void);
 void quit_screen_client(void);
 void color_screen(uint16_t winner_color);
-
+void fight_button_press(void);
+void FireWait(void);
 /*********************************************** Public Functions *********************************************************************/
 
 
