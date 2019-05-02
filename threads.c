@@ -710,6 +710,12 @@ void MoveBall() {
                 G8RTOS_SignalSemaphore(&led_mutex);
                 // TODO: Keep a win count here.
 
+                if(game_state.overallScores[i] == 0)
+                {
+                    game_state.winner = true;
+                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+                }
+
                 game_state.balls[ball_index].kill_me = true;
                 goto ball_sleep;
             }
@@ -893,7 +899,7 @@ void EndOfGameHost() {
         // kill all other threads
         G8RTOS_KillAllOtherThreads();
 
-        DrawScore(); // update the score bc a game was won
+//        DrawScore(); // update the score bc a game was won
 
         // re-initialize semaphores
         G8RTOS_InitSemaphore(&WiFi_mutex, 1);
@@ -999,28 +1005,15 @@ void EndOfGameHost() {
 
 void quit_screen_host(void){
 
-
-
-    uint8_t final_message_lose[] = "LOSER! :("; // 70, 10 for each char
-    uint8_t final_message_win[] = "WINNER! :)"; // 70, 10 for each char
-
-
-
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    color_screen(BACK_COLOR);
-    G8RTOS_SignalSemaphore(&lcd_SPI);
+    color_screen(BACK_COLOR); // clear arena
 
-    if(winner == LCD_BLUE)
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2, final_message_win, LCD_PINK);
-        G8RTOS_SignalSemaphore(&lcd_SPI);    }
+    if(winner == 0)
+        LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2-20, "Host wins!", LCD_ORANGE);
     else
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2, final_message_lose, LCD_PINK);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-    }
+        LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2-20, "Client wins!", LCD_ORANGE);
+
+    G8RTOS_SignalSemaphore(&lcd_SPI);
 
 }
 
