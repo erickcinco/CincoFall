@@ -1402,6 +1402,10 @@ extern void ReadJoystickClient(void){
 //        game_state.players[1].currentCenter += displacement; // update the game state
         client_player.displacement_x = displacement_x; // also update the packet that will be sent over wifi
         client_player.displacement_y = displacement_y; // also update the packet that will be sent over wifi
+
+        game_state.players[1].x = displacement_x;
+        game_state.players[1].y = displacement_y;
+
         sleep(10);
     }
 }
