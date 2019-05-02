@@ -5,6 +5,7 @@
 #include "G8RTOS_CriticalSection.h"
 #include "cc3100_usage.h"
 #include "Game.h"
+#include "stage.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -61,8 +62,6 @@ void end_game_button_press(void);
 bool waiting_on_player_type_designation = true;
 playerType player_type = Host;
 
-typedef enum {left, right, up, down} direction;
-
 bool update_game_score = false;
 //bool led_mutex_score = false;
 bool check_end_game_buttons = false;
@@ -118,8 +117,12 @@ void DrawScore(void){
 void DrawBoundary(void){
     //LEFT
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_DrawRectangle(ARENA_MIN_X - BOUNDARY_WIDTH, ARENA_MIN_X, ARENA_MIN_Y, ARENA_MAX_Y, LCD_WHITE);
-    LCD_DrawRectangle(ARENA_MAX_X, ARENA_MAX_X + BOUNDARY_WIDTH, ARENA_MIN_Y, ARENA_MAX_Y, LCD_WHITE);
+    for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+    {
+        draw_stage_piece(&stage_1[i]);
+    }
+//    LCD_DrawRectangle(ARENA_MIN_X - BOUNDARY_WIDTH, ARENA_MIN_X, ARENA_MIN_Y, ARENA_MAX_Y, LCD_WHITE);
+//    LCD_DrawRectangle(ARENA_MAX_X, ARENA_MAX_X + BOUNDARY_WIDTH, ARENA_MIN_Y, ARENA_MAX_Y, LCD_WHITE);
     G8RTOS_SignalSemaphore(&lcd_SPI);
 }
 
@@ -445,7 +448,7 @@ extern void CreateGame(void){
     // Add threads: GenerateBall, DrawObjects, ReadJoystickHost, SendDataToClient,ReceiveDataFromClient, MoveLEDs(lower priority), Idle
     G8RTOS_AddThread(idle_thread, 254, "idle");
     G8RTOS_AddThread(MoveLEDs, 1, "MoveLeds");
-    G8RTOS_AddThread(GenerateBall, 1, "GenBall");
+//    G8RTOS_AddThread(GenerateBall, 1, "GenBall");
     G8RTOS_AddThread(DrawObjects, 1, "DrawObj");
     G8RTOS_AddThread(ReadJoystickHost, 1, "JoyHost");
 //    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
