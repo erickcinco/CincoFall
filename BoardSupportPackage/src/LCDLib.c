@@ -9,6 +9,7 @@
 #include "msp.h"
 #include "driverlib.h"
 #include "AsciiLib.h"
+#include "Game.h"
 
 Calib calibration;
 uint16_t write_pink_flag = 0;
@@ -214,7 +215,7 @@ void LCD_Draw_Textured_Block(int16_t xStart, int16_t xEnd, int16_t yStart,
     SPISendRecvByte(SPI_START | SPI_WR | SPI_DATA); // start condition   /* Write : RS = 1, RW = 0       */
     for(uint16_t y=yStart; y<yEnd; y++){
         for(uint16_t x=xStart; x<xEnd; x++){
-            LCD_Write_Data_Only(texture[(y%8) * 8 + (x%8)]);
+            LCD_Write_Data_Only(texture[(y%TEXTURE_SIZE) * TEXTURE_SIZE + (x%TEXTURE_SIZE)]);
         }
     }
     SPI_CS_HIGH;
