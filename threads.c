@@ -1019,7 +1019,7 @@ void EndOfGameHost() {
         check_end_game_buttons = true;
 
         // todo do we need this
-//        P4->IE |= BIT4; // renable interrupt
+        P4->IE |= BIT4 | BIT5; // renable interrupt
 
         while(end_game_action == NOTHING);
 
