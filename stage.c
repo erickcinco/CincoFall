@@ -11,6 +11,12 @@
 #include <stdbool.h>
 #include <math.h>
 
+void draw_stage_piece(stage_piece_t * stage_piece) {
+    LCD_Draw_Textured_Block(stage_piece->x, stage_piece->x+stage_piece->x_size,
+                            stage_piece->y, stage_piece->y+stage_piece->y_size,
+                            *(stage_piece->texture));
+}
+
 collision_dir check_collision(Point location, int16_t x_size, int16_t y_size,
                       int16_t x_velocity, int16_t y_velocity,
                       stage_piece_t * stage_piece) {

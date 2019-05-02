@@ -178,8 +178,43 @@ void LCD_DrawRectangle(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEn
     SPI_CS_LOW; // set chip select upon start
     SPISendRecvByte(SPI_START | SPI_WR | SPI_DATA); // start condition   /* Write : RS = 1, RW = 0       */
     for(uint16_t i=xStart; i<xEnd; i++){
-        for(uint16_t i=yStart; i<yEnd; i++){
+        for(uint16_t j=yStart; j<yEnd; j++){
             LCD_Write_Data_Only(Color);
+        }
+    }
+    SPI_CS_HIGH;
+}
+
+void LCD_Draw_Textured_Block(int16_t xStart, int16_t xEnd, int16_t yStart,
+                             int16_t yEnd, uint16_t * texture) {
+    if(xStart < 0){
+        xStart = 0;
+    }
+    if(xEnd > MAX_SCREEN_X){
+        xEnd = MAX_SCREEN_X;
+    }
+    if(yStart < 0){
+        yStart = 0;
+    }
+    if(yEnd > MAX_SCREEN_Y){
+        yEnd = MAX_SCREEN_Y;
+    }
+    /* Set window area for high-speed RAM write */
+    LCD_WriteReg(HOR_ADDR_START_POS, yStart);     /* Horizontal GRAM Start Address */
+    LCD_WriteReg(HOR_ADDR_END_POS, (yEnd - 1));  /* Horizontal GRAM End Address */
+    LCD_WriteReg(VERT_ADDR_START_POS, xStart);    /* Vertical GRAM Start Address */
+    LCD_WriteReg(VERT_ADDR_END_POS, (xEnd - 1)); /* Vertical GRAM End Address */
+
+    /* Set cursor */
+    LCD_SetCursor(xStart, yStart);
+    /* Set index to GRAM */
+    LCD_WriteIndex(GRAM);
+    /* Send out data only to the entire area */
+    SPI_CS_LOW; // set chip select upon start
+    SPISendRecvByte(SPI_START | SPI_WR | SPI_DATA); // start condition   /* Write : RS = 1, RW = 0       */
+    for(uint16_t y=yStart; y<yEnd; y++){
+        for(uint16_t x=xStart; x<xEnd; x++){
+            LCD_Write_Data_Only(texture[(y%8) * 8 + (x%8)]);
         }
     }
     SPI_CS_HIGH;
