@@ -1018,6 +1018,9 @@ void EndOfGameHost() {
         //Create an aperiodic thread that waits for the host's button press (the client will just be waiting on the host to start a new game)
         check_end_game_buttons = true;
 
+        // todo do we need this
+//        P4->IE |= BIT4; // renable interrupt
+
         while(end_game_action == NOTHING);
 
         NVIC_DisableIRQ(PORT4_IRQn);
@@ -1070,6 +1073,15 @@ void EndOfGameHost() {
             G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
             G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
             G8RTOS_AddThread(idle_thread, 254, "idle");
+
+            P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
+            P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
+            P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
+            P4IES |= BIT4 | BIT5;  // high-to-low transition
+            P4REN |= BIT4 | BIT5;  // Pull-up resistor
+            P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
+
+            NVIC_EnableIRQ(PORT4_IRQn); // reenable the interrupt
 
 
         }
@@ -1537,6 +1549,15 @@ void EndOfGameClient() {
                 G8RTOS_AddThread(ReadJoystickClient, 1, "JoyClient");
                 G8RTOS_AddThread(DrawObjects, 1, "DrawObj");
                 G8RTOS_AddThread(idle_thread, 254, "idle");
+
+                P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
+                P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
+                P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
+                P4IES |= BIT4 | BIT5;  // high-to-low transition
+                P4REN |= BIT4 | BIT5;  // Pull-up resistor
+                P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
+
+                NVIC_EnableIRQ(PORT4_IRQn); // reenable the interrupt
             }
             else if(game_state.gameDone == true && game_state.winner == true)
             {
