@@ -257,7 +257,6 @@ void LCD_Draw_Sprite(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd,
         for(uint16_t j=yStart; j<yEnd; j++){
             LCD_Write_Data_Only(*color_array);
                 color_array++;
-
         }
     }
     SPI_CS_HIGH;

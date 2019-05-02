@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include "G8RTOS.h"
 
+//#include "fighter_cat_gif_color_array_no_background.h"
+
+
 // instantiate mutexs
 semaphore_t sensor_I2C;
 semaphore_t led_I2C;
@@ -121,38 +124,42 @@ void DrawBoundary(void){
 }
 
 void DrawPlayer(GeneralPlayerInfo_t * player){
-    int16_t y_start;
-    int16_t y_end;
-    int16_t x_start = player->currentCenter - PADDLE_LEN_D2;
-    int16_t x_end = player->currentCenter + PADDLE_LEN_D2;
+    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
+    int16_t y_end = ARENA_MAX_Y;
+    int16_t x_start = player->currentCenter;
+    int16_t x_end = player->currentCenter + PLAYER_LEN;
 
     // handle boundary case for x direction
-    if(x_start < ARENA_MIN_X)
-    {
-        player->currentCenter = HORIZ_CENTER_MIN_PL;
-        x_start = ARENA_MIN_X;
-        x_end = ARENA_MIN_X + PADDLE_LEN;
-    }
-    if(x_end > ARENA_MAX_X)
-    {
-        player->currentCenter = HORIZ_CENTER_MAX_PL;
-        x_start = ARENA_MAX_X-PADDLE_LEN;
-        x_end = ARENA_MAX_X;
-    }
+//    if(x_start < ARENA_MIN_X)
+//    {
+//        player->currentCenter = HORIZ_CENTER_MIN_PL;
+//        x_start = ARENA_MIN_X;
+//        x_end = ARENA_MIN_X + PADDLE_LEN;
+//    }
+//    if(x_end > ARENA_MAX_X)
+//    {
+//        player->currentCenter = HORIZ_CENTER_MAX_PL;
+//        x_start = ARENA_MAX_X-PADDLE_LEN;
+//        x_end = ARENA_MAX_X;
+//    }
     // handle y start and end
-    if(player->position == BOTTOM)
-    {
-        y_start = BOTTOM_PADDLE_EDGE;
-        y_end = ARENA_MAX_Y;
-    }
-    if(player->position == TOP)
-    {
-        y_start = ARENA_MIN_Y;
-        y_end = TOP_PADDLE_EDGE;
-    }
+//    if(player->position == BOTTOM)
+//    {
+//        y_start = BOTTOM_PADDLE_EDGE;
+//        y_end = ARENA_MAX_Y;
+//    }
+//    if(player->position == TOP)
+//    {
+//        y_start = ARENA_MIN_Y;
+//        y_end = TOP_PADDLE_EDGE;
+//    }
 
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_DrawRectangle(x_start, x_end, y_start, y_end, player->color);
+//    LCD_DrawRectangle(x_start, x_end, y_start, y_end, player->color);
+    LCD_Draw_Sprite(x_start, x_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
+//    LCD_Draw_Sprite(x_start, x_end, y_start, y_end, player->texture);
+    //    LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_0);
+
     G8RTOS_SignalSemaphore(&lcd_SPI);
 }
 
@@ -243,53 +250,61 @@ void DrawObjects(void){
 
 void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * outPlayer){
     // only update if new center is different than past center
-    int16_t y_start;
-    int16_t y_end;
-    int16_t x_old_start = (prevPlayerIn->Center) - PADDLE_LEN_D2;
-    int16_t x_old_end = (prevPlayerIn->Center) + PADDLE_LEN_D2;
-    int16_t x_new_start = (outPlayer->currentCenter) - PADDLE_LEN_D2;
-    int16_t x_new_end = (outPlayer->currentCenter) + PADDLE_LEN_D2;
+    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
+    int16_t y_end = ARENA_MAX_Y;
+    int16_t x_old_start = (prevPlayerIn->Center);
+    int16_t x_old_end = (prevPlayerIn->Center) + PLAYER_LEN;
+    int16_t x_new_start = (outPlayer->currentCenter);
+    int16_t x_new_end = (outPlayer->currentCenter) + PLAYER_LEN;
     // handle boundary case for x direction
-    if(x_new_start < ARENA_MIN_X + 2)
-    {
-        outPlayer->currentCenter = HORIZ_CENTER_MIN_PL + 2;
-        x_new_start = ARENA_MIN_X + 2;
-        x_new_end = ARENA_MIN_X + 2 + PADDLE_LEN;
-    }
-    if(x_new_end >= ARENA_MAX_X - 2)
-    {
-        outPlayer->currentCenter = HORIZ_CENTER_MAX_PL - 2;
-        x_new_start = ARENA_MAX_X - 2 - PADDLE_LEN;
-        x_new_end = ARENA_MAX_X - 2;
-    }
-    // handle y start and end
-    if(outPlayer->position == BOTTOM)
-    {
-        y_start = BOTTOM_PADDLE_EDGE;
-        y_end = ARENA_MAX_Y;
-    }
-    if(outPlayer->position == TOP)
-    {
-        y_start = ARENA_MIN_Y;
-        y_end = TOP_PADDLE_EDGE;
-    }
+//    if(x_new_start < ARENA_MIN_X + 2)
+//    {
+//        outPlayer->currentCenter = HORIZ_CENTER_MIN_PL + 2;
+//        x_new_start = ARENA_MIN_X + 2;
+//        x_new_end = ARENA_MIN_X + 2 + PADDLE_LEN;
+//    }
+//    if(x_new_end >= ARENA_MAX_X - 2)
+//    {
+//        outPlayer->currentCenter = HORIZ_CENTER_MAX_PL - 2;
+//        x_new_start = ARENA_MAX_X - 2 - PADDLE_LEN;
+//        x_new_end = ARENA_MAX_X - 2;
+//    }
+//    // handle y start and end
+//    if(outPlayer->position == BOTTOM)
+//    {
+//        y_start = BOTTOM_PADDLE_EDGE;
+//        y_end = ARENA_MAX_Y;
+//    }
+//    if(outPlayer->position == TOP)
+//    {
+//        y_start = ARENA_MIN_Y;
+//        y_end = TOP_PADDLE_EDGE;
+//    }
 
+//    if((outPlayer->currentCenter) != (prevPlayerIn->Center) )
+    {
+
+        G8RTOS_WaitSemaphore(&lcd_SPI);
+        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start, y_end, BACK_COLOR);
+        LCD_Draw_Sprite(x_new_start, x_new_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
+        G8RTOS_SignalSemaphore(&lcd_SPI);
+    }
     // clear stale paddle data
-    if( (outPlayer->currentCenter) < (prevPlayerIn->Center) )
-    {
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_DrawRectangle(x_new_end, x_old_end + WIGGLE_ROOM, y_start, y_end, BACK_COLOR);
-
-        LCD_DrawRectangle(x_new_start, x_old_start + WIGGLE_ROOM, y_start, y_end, outPlayer->color);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-    }
-    else{
-        G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_DrawRectangle(x_old_start - WIGGLE_ROOM, x_new_start, y_start, y_end, BACK_COLOR);
-        LCD_DrawRectangle(x_old_end - WIGGLE_ROOM, x_new_end, y_start, y_end, outPlayer->color);
-        G8RTOS_SignalSemaphore(&lcd_SPI);
-
-    }
+//    if( (outPlayer->currentCenter) < (prevPlayerIn->Center) )
+//    {
+//        G8RTOS_WaitSemaphore(&lcd_SPI);
+//        LCD_DrawRectangle(x_new_end, x_old_end + WIGGLE_ROOM, y_start, y_end, BACK_COLOR);
+//
+//        LCD_DrawRectangle(x_new_start, x_old_start + WIGGLE_ROOM, y_start, y_end, outPlayer->color);
+//        G8RTOS_SignalSemaphore(&lcd_SPI);
+//    }
+//    else{
+//        G8RTOS_WaitSemaphore(&lcd_SPI);
+//        LCD_DrawRectangle(x_old_start - WIGGLE_ROOM, x_new_start, y_start, y_end, BACK_COLOR);
+//        LCD_DrawRectangle(x_old_end - WIGGLE_ROOM, x_new_end, y_start, y_end, outPlayer->color);
+//        G8RTOS_SignalSemaphore(&lcd_SPI);
+//
+//    }
 
 
 }
@@ -391,9 +406,10 @@ extern void CreateGame(void){
     game_state.gameDone = false;
     for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
     {
-        game_state.players[i].currentCenter = PADDLE_X_CENTER; // start with paddles in center of screen
         game_state.LEDScores[i] = 0;
     }
+    game_state.players[0].currentCenter = PLAYER_1_CENTER; // start with paddles in center of screen
+    game_state.players[1].currentCenter = PLAYER_2_CENTER; // start with paddles in center of screen
     game_state.overallScores[0] = 0;
     game_state.overallScores[1] = 0;
     game_state.LEDScores[0] = 0;
@@ -424,7 +440,7 @@ extern void CreateGame(void){
     G8RTOS_InitSemaphore(&lcd_SPI, 1);
 
     // Wifi mutex
-    G8RTOS_InitSemaphore(&WiFi_mutex, 1); // can I move this to the other semaphore init area
+//    G8RTOS_InitSemaphore(&WiFi_mutex, 1); // can I move this to the other semaphore init area
 
     // Add threads: GenerateBall, DrawObjects, ReadJoystickHost, SendDataToClient,ReceiveDataFromClient, MoveLEDs(lower priority), Idle
     G8RTOS_AddThread(idle_thread, 254, "idle");
@@ -432,8 +448,8 @@ extern void CreateGame(void){
     G8RTOS_AddThread(GenerateBall, 1, "GenBall");
     G8RTOS_AddThread(DrawObjects, 1, "DrawObj");
     G8RTOS_AddThread(ReadJoystickHost, 1, "JoyHost");
-    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
-    G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
+//    G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
+//    G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
 
     // Kill self
     G8RTOS_KillSelf();

@@ -31,26 +31,26 @@ void main(void) {
 //    LCD_Draw_Sprite(100, 100 + PARROT_SPRITE_WIDTH, 100, 100 + PARROT_SPRITE_HEIGHT, parrot_color_array);
 //    LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + DOG_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + DOG_SPRITE_HEIGHT, dog_color_array);
 
-    while(1){
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_0);
-        Delay(REFRESH);
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_1);
-        Delay(REFRESH);
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_2);
-        Delay(REFRESH);
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_5);
-        Delay(REFRESH);
-        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_6);
-        Delay(REFRESH);
+//    while(1){
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_0);
+//        Delay(REFRESH);
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_1);
+//        Delay(REFRESH);
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_2);
+//        Delay(REFRESH);
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_5);
+//        Delay(REFRESH);
+//        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_6);
+//        Delay(REFRESH);
 //        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_7);
 //        Delay(REFRESH);
 //        LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_8);
 //        Delay(REFRESH);
-    }
+//    }
 
-//
-//    AcquirePlayerRole();
-//
+
+    AcquirePlayerRole();
+
 //    // Perform Client-Host Handshake
 //    {
 //        if(GetPlayerRole() == Host)
@@ -118,18 +118,18 @@ void main(void) {
 //
 //        LCD_Clear(BACK_COLOR);
 //    }
-//
-//
-//    if(GetPlayerRole() == Host)
-//    {
-//        G8RTOS_AddThread(CreateGame, 1, "CreateGame");
-//    }
-//    else //if(GetPlayerRole() == Client)
-//    {
-//        G8RTOS_AddThread(JoinGame, 1, "JoinGame");
-//    }
-//
-//    G8RTOS_Launch();
+
+
+    if(GetPlayerRole() == Host)
+    {
+        G8RTOS_AddThread(CreateGame, 1, "CreateGame");
+    }
+    else //if(GetPlayerRole() == Client)
+    {
+        G8RTOS_AddThread(JoinGame, 1, "JoinGame");
+    }
+
+    G8RTOS_Launch();
     PCM_gotoLPM0();
 
 
