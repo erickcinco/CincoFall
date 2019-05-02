@@ -296,7 +296,7 @@ void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * out
     {
 
         G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start, y_end, BACK_COLOR);
+        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start-2*WIGGLE_ROOM, y_end+2*WIGGLE_ROOM, BACK_COLOR);
         LCD_Draw_Sprite(x_new_start, x_new_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
@@ -468,11 +468,13 @@ extern void CreateGame(void){
 }
 
 extern void ReadJoystickHost(void){
-    int16_t displacement = 0;
+    int16_t displacement_x = 0;
+    int16_t displacement_y = 0;
     while(1){
         GetJoystickCoordinates(&joystick_host_x_coor, &joystick_host_y_coor);
         // do we need to bias the value?
-        displacement = joystick_host_x_coor / -4096;
+        displacement_x = joystick_host_x_coor / -4096;
+        displacement_y = joystick_host_y_coor / 4096;
 
 //        if(joystick_host_x_coor > 8000)
 //        {
@@ -490,7 +492,8 @@ extern void ReadJoystickHost(void){
 //        {
 //            displacement = 1;
 //        }
-        game_state.players[0].x += displacement; // update player 0 who is the host players is part of game state struct
+        game_state.players[0].x += displacement_x; // update player 0 who is the host players is part of game state struct
+        game_state.players[0].y += displacement_y;
         game_state.players[1].x += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
 
         sleep(10);
