@@ -160,7 +160,7 @@ void DrawPlayer(GeneralPlayerInfo_t * player){
 
     G8RTOS_WaitSemaphore(&lcd_SPI);
 //    LCD_DrawRectangle(x_start, x_end, y_start, y_end, player->color);
-    LCD_Draw_Sprite(x_start, x_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
+    LCD_Draw_Sprite(x_start, x_end, y_start, y_end, fighter_cat_gif_color_array);
 //    LCD_Draw_Sprite(x_start, x_end, y_start, y_end, player->texture);
     //    LCD_Draw_Sprite(MAX_SCREEN_X/2, MAX_SCREEN_X/2 + FIGHTER_CAT_SPRITE_WIDTH, MAX_SCREEN_Y/2, MAX_SCREEN_Y/2 + FIGHTER_CAT_SPRITE_HEIGHT, fighter_cat_gif_color_array_frame_0);
 
@@ -298,7 +298,7 @@ void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * out
 
         G8RTOS_WaitSemaphore(&lcd_SPI);
         LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start-2*WIGGLE_ROOM, y_end+2*WIGGLE_ROOM, BACK_COLOR);
-        LCD_Draw_Sprite(x_new_start, x_new_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
+        LCD_Draw_Sprite(x_new_start, x_new_end, y_start, y_end, fighter_cat_gif_color_array);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
     // clear stale paddle data
@@ -539,10 +539,10 @@ extern void ReadJoystickHost(void){
 
         for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
         {
-            Point player_position = {game_state.players[0].x,
-                                     game_state.players[0].y};
+            Point player_position = {game_state.players[0].x - WIGGLE_ROOM,
+                                     game_state.players[0].y - 2*WIGGLE_ROOM};
             dir = check_collision(player_position,
-                                  PLAYER_LEN, PLAYER_WID,
+                                  PLAYER_LEN+2*WIGGLE_ROOM, PLAYER_WID+4*WIGGLE_ROOM,
                                   displacement_x, displacement_y,
                                   &stage_1[i]);
             if(dir != none)
