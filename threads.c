@@ -287,38 +287,23 @@ void MoveLEDs(void){
     while(1){
         G8RTOS_WaitSemaphore(&led_mutex);
 
-        switch(game_state.overallScores[1])
-        {
-        case 0:
-            blue_score = 0;
-            break;
-        case 1:
-            blue_score = BITF;
-            break;
-        case 2:
-            blue_score = BITF | BITE;
-            break;
-        case 3:
-            blue_score = BITF | BITE | BITD;
-            break;
-        }
-
-        switch(game_state.overallScores[0])
-        {
-            case 0:
-                red_score = 0;
-                break;
-            case 1:
-                red_score = BIT0 ;
-                break;
-            case 2:
-                red_score = BIT0 | BIT1;
-                break;
-            case 3:
-                red_score = BIT0 | BIT1 | BIT2;
-                break;
-        }
-//        switch(game_state.LEDScores[1])
+//        switch(game_state.overallScores[1])
+//        {
+//        case 0:
+//            blue_score = 0;
+//            break;
+//        case 1:
+//            blue_score = BITF;
+//            break;
+//        case 2:
+//            blue_score = BITF | BITE;
+//            break;
+//        case 3:
+//            blue_score = BITF | BITE | BITD;
+//            break;
+//        }
+//
+//        switch(game_state.overallScores[0])
 //        {
 //            case 0:
 //                red_score = 0;
@@ -332,53 +317,68 @@ void MoveLEDs(void){
 //            case 3:
 //                red_score = BIT0 | BIT1 | BIT2;
 //                break;
-//            case 4:
-//                red_score = BIT0 | BIT1 | BIT2 | BIT3;
-//                break;
-//            case 5:
-//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
-//                break;
-//            case 6:
-//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
-//                break;
-//            case 7:
-//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
-//                break;
-//            case 8:
-//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
-//                break;
 //        }
-//
-//        switch(game_state.LEDScores[0])
-//        {
-//            case 0:
-//                blue_score = 0;
-//                break;
-//            case 1:
-//                blue_score = BITF;
-//                break;
-//            case 2:
-//                blue_score = BITF | BITE;
-//                break;
-//            case 3:
-//                blue_score = BITF | BITE | BITD;
-//                break;
-//            case 4:
-//                blue_score = BITF | BITE | BITD | BITC;
-//                break;
-//            case 5:
-//                blue_score = BITF | BITE | BITD | BITC | BITB;
-//                break;
-//            case 6:
-//                blue_score = BITF | BITE | BITD | BITC | BITB | BITA;
-//                break;
-//            case 7:
-//                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
-//                break;
-//            case 8:
-//                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
-//                break;
-//        }
+        switch(game_state.overallScores[1])
+        {
+            case 0:
+                red_score = 0;
+                break;
+            case 1:
+                red_score = BIT0 ;
+                break;
+            case 2:
+                red_score = BIT0 | BIT1;
+                break;
+            case 3:
+                red_score = BIT0 | BIT1 | BIT2;
+                break;
+            case 4:
+                red_score = BIT0 | BIT1 | BIT2 | BIT3;
+                break;
+            case 5:
+                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
+                break;
+            case 6:
+                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
+                break;
+            case 7:
+                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
+                break;
+            case 8:
+                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
+                break;
+        }
+
+        switch(game_state.overallScores[0])
+        {
+            case 0:
+                blue_score = 0;
+                break;
+            case 1:
+                blue_score = BITF;
+                break;
+            case 2:
+                blue_score = BITF | BITE;
+                break;
+            case 3:
+                blue_score = BITF | BITE | BITD;
+                break;
+            case 4:
+                blue_score = BITF | BITE | BITD | BITC;
+                break;
+            case 5:
+                blue_score = BITF | BITE | BITD | BITC | BITB;
+                break;
+            case 6:
+                blue_score = BITF | BITE | BITD | BITC | BITB | BITA;
+                break;
+            case 7:
+                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
+                break;
+            case 8:
+                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
+                break;
+        }
 
         LP3943_LedModeSet(RED, red_score);
         LP3943_LedModeSet(BLUE, blue_score);
@@ -416,11 +416,11 @@ extern void CreateGame(void){
 //    game_state.LEDScores[0] = 0;
 //    game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].x = 37;
-    game_state.players[0].y = 37;
+    game_state.players[0].x = 30;
+    game_state.players[0].y = 30;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
-    game_state.players[1].y = 37;
+    game_state.players[1].x = MAX_SCREEN_X - 30 - PLAYER_WID;
+    game_state.players[1].y = 30;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
@@ -576,7 +576,7 @@ void GenerateBall() {
 
 void MoveBall_host() {
     uint_fast8_t ball_index;
-    uint_fast8_t player_origin_index = 0; // TODO: replace this hard-coding
+    uint_fast8_t player_origin_index = 0;
     int16_t velocity_x = 0;
     int16_t velocity_y = 0;
     for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
@@ -874,6 +874,7 @@ void MoveBall_host() {
 
 void MoveBall_client() {
     uint_fast8_t ball_index;
+    uint_fast8_t player_origin_index = 1;
     int16_t velocity_x = 0;
     int16_t velocity_y = 0;
     for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
@@ -946,20 +947,47 @@ void MoveBall_client() {
         static int16_t predictedCenterY = 0;
         static bool collision_predicted = false;
 
-        if(collision_predicted)
-        {
-            game_state.balls[ball_index].currentCenterX = predictedCenterX;
-            game_state.balls[ball_index].currentCenterY = predictedCenterY;
+        // WARNING: Assumes ball size of 4
+        Point position = {game_state.balls[ball_index].currentCenterX,
+                          game_state.balls[ball_index].currentCenterY};
 
-            collision_predicted = false;
-        }
-        else
+        for(int i = 0; i < NUM_OF_PLAYERS_PLAYING; i++)
         {
+            if(i == player_origin_index)
+                continue;
+
+            stage_piece_t temp = {game_state.players[i].x,
+                                  game_state.players[i].y,
+                                  PLAYER_WID,
+                                  PLAYER_LEN,
+                                  0
+            };
+            collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &temp);
+
+            if(dir != none)
+            {
+                game_state.overallScores[i]--;
+                G8RTOS_SignalSemaphore(&led_mutex);
+                // TODO: Keep a win count here.
+
+                if(game_state.overallScores[i] == 0)
+                {
+                    game_state.winner = true;
+                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+                }
+
+                game_state.balls[ball_index].kill_me = true;
+                goto client_ball_sleep;
+            }
+        }
+
+
 //      Ball movement
         game_state.balls[ball_index].currentCenterX += velocity_x;
         game_state.balls[ball_index].currentCenterY += velocity_y;
-        }
 
+
+        client_ball_sleep:
         sleep(35); //sleep for 35
     }
 }
@@ -1437,7 +1465,7 @@ void ReceiveDataFromHost() {
         {
 
             // check if game scores have changed
-            if(game_state.LEDScores[0] != gamestate_from_host.LEDScores[0] || game_state.LEDScores[1] != gamestate_from_host.LEDScores[1])
+            if(game_state.overallScores[0] != gamestate_from_host.overallScores[0] || game_state.overallScores[1] != gamestate_from_host.overallScores[1])
             {
                 // signal led mutex
                 G8RTOS_SignalSemaphore(&led_mutex);
