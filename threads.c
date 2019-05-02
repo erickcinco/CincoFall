@@ -67,7 +67,7 @@ bool update_game_score = false;
 //bool led_mutex_score = false;
 bool check_end_game_buttons = false;
 
-playerColor winner;
+uint8_t winner;
 endGameAction end_game_action = NOTHING;
 
 void DrawScore(void){
@@ -327,7 +327,23 @@ void MoveLEDs(void){
     while(1){
         G8RTOS_WaitSemaphore(&led_mutex);
 
-        switch(game_state.LEDScores[1])
+        switch(game_state.overallScores[1])
+        {
+        case 0:
+            blue_score = 0;
+            break;
+        case 1:
+            blue_score = BITF;
+            break;
+        case 2:
+            blue_score = BITF | BITE;
+            break;
+        case 3:
+            blue_score = BITF | BITE | BITD;
+            break;
+        }
+
+        switch(game_state.overallScores[0])
         {
             case 0:
                 red_score = 0;
@@ -341,53 +357,68 @@ void MoveLEDs(void){
             case 3:
                 red_score = BIT0 | BIT1 | BIT2;
                 break;
-            case 4:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3;
-                break;
-            case 5:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
-                break;
-            case 6:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
-                break;
-            case 7:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
-                break;
-            case 8:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
-                break;
         }
-
-        switch(game_state.LEDScores[0])
-        {
-            case 0:
-                blue_score = 0;
-                break;
-            case 1:
-                blue_score = BITF;
-                break;
-            case 2:
-                blue_score = BITF | BITE;
-                break;
-            case 3:
-                blue_score = BITF | BITE | BITD;
-                break;
-            case 4:
-                blue_score = BITF | BITE | BITD | BITC;
-                break;
-            case 5:
-                blue_score = BITF | BITE | BITD | BITC | BITB;
-                break;
-            case 6:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA;
-                break;
-            case 7:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
-                break;
-            case 8:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
-                break;
-        }
+//        switch(game_state.LEDScores[1])
+//        {
+//            case 0:
+//                red_score = 0;
+//                break;
+//            case 1:
+//                red_score = BIT0 ;
+//                break;
+//            case 2:
+//                red_score = BIT0 | BIT1;
+//                break;
+//            case 3:
+//                red_score = BIT0 | BIT1 | BIT2;
+//                break;
+//            case 4:
+//                red_score = BIT0 | BIT1 | BIT2 | BIT3;
+//                break;
+//            case 5:
+//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
+//                break;
+//            case 6:
+//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
+//                break;
+//            case 7:
+//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
+//                break;
+//            case 8:
+//                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
+//                break;
+//        }
+//
+//        switch(game_state.LEDScores[0])
+//        {
+//            case 0:
+//                blue_score = 0;
+//                break;
+//            case 1:
+//                blue_score = BITF;
+//                break;
+//            case 2:
+//                blue_score = BITF | BITE;
+//                break;
+//            case 3:
+//                blue_score = BITF | BITE | BITD;
+//                break;
+//            case 4:
+//                blue_score = BITF | BITE | BITD | BITC;
+//                break;
+//            case 5:
+//                blue_score = BITF | BITE | BITD | BITC | BITB;
+//                break;
+//            case 6:
+//                blue_score = BITF | BITE | BITD | BITC | BITB | BITA;
+//                break;
+//            case 7:
+//                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
+//                break;
+//            case 8:
+//                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
+//                break;
+//        }
 
         LP3943_LedModeSet(RED, red_score);
         LP3943_LedModeSet(BLUE, blue_score);
@@ -420,10 +451,10 @@ extern void CreateGame(void){
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.overallScores[0] = 0;
-    game_state.overallScores[1] = 0;
-    game_state.LEDScores[0] = 0;
-    game_state.LEDScores[1] = 0;
+    game_state.overallScores[0] = 3;
+    game_state.overallScores[1] = 3;
+//    game_state.LEDScores[0] = 0;
+//    game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
     game_state.players[0].x = 37;
     game_state.players[0].y = 37;
@@ -440,10 +471,10 @@ extern void CreateGame(void){
     }
 
     // add any semaphores
-    G8RTOS_InitSemaphore(&led_mutex, 0);
+    G8RTOS_InitSemaphore(&led_mutex, 1);
     // semaphore init shit
     // LED I2C mutex
-    G8RTOS_InitSemaphore(&led_I2C, 0);
+    G8RTOS_InitSemaphore(&led_I2C, 1);
 
     // sensor I2C mutex
     G8RTOS_InitSemaphore(&sensor_I2C, 1);
@@ -559,6 +590,7 @@ void GenerateBall() {
 
 void MoveBall() {
     uint_fast8_t ball_index;
+    uint_fast8_t player_origin_index = 0; // TODO: replace this hard-coding
     int16_t velocity_x = 0;
     int16_t velocity_y = 0;
     for(ball_index = 0; ball_index < MAX_NUM_OF_BALLS; ball_index++)
@@ -573,12 +605,12 @@ void MoveBall() {
     // designate this ball will be alive
     game_state.balls[ball_index].alive = true;
 
-    game_state.balls[ball_index].color = LCD_WHITE;
+    game_state.balls[ball_index].color = LCD_ORANGE;
 
-    game_state.balls[ball_index].currentCenterX = game_state.players[0].x + PLAYER_LEN_D2;
+    game_state.balls[ball_index].currentCenterX = game_state.players[player_origin_index].x + PLAYER_LEN_D2;
 //            (rand() % (HORIZ_CENTER_MAX_BALL - HORIZ_CENTER_MIN_BALL)) +
 //            HORIZ_CENTER_MIN_BALL;
-    game_state.balls[ball_index].currentCenterY = game_state.players[0].y + PLAYER_WID_D2;
+    game_state.balls[ball_index].currentCenterY = game_state.players[player_origin_index].y + PLAYER_WID_D2;
 //            (rand() % (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)) +
 //            VERT_CENTER_MIN_BALL;
 
@@ -643,7 +675,8 @@ void MoveBall() {
 
     while(1)
     {
-        if(game_state.balls[ball_index].kill_me == true)
+        if(game_state.balls[ball_index].kill_me ||
+           !game_state.balls[ball_index].alive)
         {
             G8RTOS_KillSelf();
             while(1);
@@ -657,6 +690,30 @@ void MoveBall() {
         // WARNING: Assumes ball size of 4
         Point position = {game_state.balls[ball_index].currentCenterX,
                           game_state.balls[ball_index].currentCenterY};
+
+        for(int i = 0; i < NUM_OF_PLAYERS_PLAYING; i++)
+        {
+            if(i == player_origin_index)
+                continue;
+
+            stage_piece_t temp = {game_state.players[i].x,
+                                  game_state.players[i].y,
+                                  PLAYER_WID,
+                                  PLAYER_LEN,
+                                  0
+            };
+            collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &temp);
+
+            if(dir != none)
+            {
+                game_state.overallScores[i]--;
+                G8RTOS_SignalSemaphore(&led_mutex);
+                // TODO: Keep a win count here.
+
+                game_state.balls[ball_index].kill_me = true;
+                goto ball_sleep;
+            }
+        }
 
         for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
         {
@@ -840,7 +897,7 @@ void EndOfGameHost() {
 
         // re-initialize semaphores
         G8RTOS_InitSemaphore(&WiFi_mutex, 1);
-        G8RTOS_InitSemaphore(&led_mutex, 0);
+        G8RTOS_InitSemaphore(&led_mutex, 1);
         G8RTOS_InitSemaphore(&lcd_SPI, 1);
 
 
@@ -1279,11 +1336,11 @@ void ReceiveDataFromHost() {
                 if(game_state.overallScores[0] > game_state.overallScores[1])
                 {
                     // update game score global
-                    winner = game_state.players[0].color;
+                    winner = 0;
                 }
                 else
                 {
-                    winner = game_state.players[1].color;
+                    winner = 1;
                 }
                 G8RTOS_AddThread(EndOfGameClient, 1, "EndGameClient");
             }
@@ -1300,7 +1357,7 @@ void ReceiveDataFromHost() {
 void EndOfGameClient() {
     while(1) // TODO: Actually write code for end state
     {
-            DrawScore();
+//            DrawScore();
 
 
         // wait for all semaphores to be released
@@ -1370,10 +1427,15 @@ void client_end_game_screen(){
     uint8_t wait_for_host_message[] = "Waiting for host...";// 230 10 for each char
 //    uint8_t quit_game_message[] = "Press B1 to quit!"; // 170 10 for each char
 
-    color_screen(winner); // clear arena with color of winning player
-
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 120)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/4, wait_for_host_message, LCD_WHITE);
+    color_screen(BACK_COLOR); // clear arena
+
+    if(winner == 0)
+        LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2-20, "Host wins!", LCD_ORANGE);
+    else
+        LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2-20, "Client wins!", LCD_ORANGE);
+
+    LCD_Text(2, 2, wait_for_host_message, LCD_WHITE);
     G8RTOS_SignalSemaphore(&lcd_SPI);
 }
 
