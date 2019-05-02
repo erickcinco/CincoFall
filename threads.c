@@ -128,10 +128,10 @@ void DrawBoundary(void){
 }
 
 void DrawPlayer(GeneralPlayerInfo_t * player){
-    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
-    int16_t y_end = ARENA_MAX_Y;
-    int16_t x_start = player->currentCenter;
-    int16_t x_end = player->currentCenter + PLAYER_LEN;
+    int16_t y_start = player->y;
+    int16_t y_end = player->y + PLAYER_WID;
+    int16_t x_start = player->x;
+    int16_t x_end = player->x + PLAYER_LEN;
 
     // handle boundary case for x direction
 //    if(x_start < ARENA_MIN_X)
@@ -170,8 +170,10 @@ void DrawPlayer(GeneralPlayerInfo_t * player){
 void DrawObjects(void){
     PrevPlayer_t prev_red_x;
     PrevPlayer_t prev_blue_x;
-    prev_red_x.Center = game_state.players[1].currentCenter;
-    prev_blue_x.Center = game_state.players[0].currentCenter;
+    prev_red_x.x = game_state.players[1].x;
+    prev_red_x.y = game_state.players[1].y;
+    prev_blue_x.x = game_state.players[0].x;
+    prev_blue_x.y = game_state.players[0].y;
     PrevBall_t prev_ball_array[MAX_NUM_OF_BALLS];
 
     // Init prev ball array
@@ -240,26 +242,32 @@ void DrawObjects(void){
         }
 
         // update paddles
-        if(game_state.players[1].currentCenter != prev_red_x.Center){
+        if((game_state.players[1].x != prev_red_x.x) ||
+           (game_state.players[1].y != prev_red_x.y))
+        {
             UpdatePlayerOnScreen(&prev_red_x, &(game_state.players[1]));
         }
-        if(game_state.players[0].currentCenter != prev_blue_x.Center){
+        if((game_state.players[0].x != prev_blue_x.x) ||
+           (game_state.players[0].y != prev_blue_x.y))
+        {
             UpdatePlayerOnScreen(&prev_blue_x, &(game_state.players[0]));
         }
-        prev_red_x.Center = game_state.players[1].currentCenter;
-        prev_blue_x.Center = game_state.players[0].currentCenter;
+        prev_red_x.x = game_state.players[1].x;
+        prev_red_x.y = game_state.players[1].y;
+        prev_blue_x.x = game_state.players[0].x;
+        prev_blue_x.y = game_state.players[0].y;
         sleep(20); // sleep for 20ms (reasonable refresh rate)
     }
 }
 
 void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * outPlayer){
     // only update if new center is different than past center
-    int16_t y_start = ARENA_MAX_Y-PLAYER_WID;
-    int16_t y_end = ARENA_MAX_Y;
-    int16_t x_old_start = (prevPlayerIn->Center);
-    int16_t x_old_end = (prevPlayerIn->Center) + PLAYER_LEN;
-    int16_t x_new_start = (outPlayer->currentCenter);
-    int16_t x_new_end = (outPlayer->currentCenter) + PLAYER_LEN;
+    int16_t y_start = (prevPlayerIn->y);
+    int16_t y_end = prevPlayerIn->y + PLAYER_WID;
+    int16_t x_old_start = (prevPlayerIn->x);
+    int16_t x_old_end = (prevPlayerIn->x) + PLAYER_LEN;
+    int16_t x_new_start = (outPlayer->x);
+    int16_t x_new_end = (outPlayer->x) + PLAYER_LEN;
     // handle boundary case for x direction
 //    if(x_new_start < ARENA_MIN_X + 2)
 //    {
@@ -289,7 +297,7 @@ void UpdatePlayerOnScreen(PrevPlayer_t * prevPlayerIn, GeneralPlayerInfo_t * out
     {
 
         G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start, y_end, BACK_COLOR);
+        LCD_DrawRectangle(x_old_start-WIGGLE_ROOM, x_old_end+WIGGLE_ROOM, y_start-2*WIGGLE_ROOM, y_end+2*WIGGLE_ROOM, BACK_COLOR);
         LCD_Draw_Sprite(x_new_start, x_new_end, y_start, y_end, fighter_cat_gif_color_array_frame_0);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
@@ -412,16 +420,16 @@ extern void CreateGame(void){
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.players[0].currentCenter = PLAYER_1_CENTER; // start with paddles in center of screen
-    game_state.players[1].currentCenter = PLAYER_2_CENTER; // start with paddles in center of screen
     game_state.overallScores[0] = 0;
     game_state.overallScores[1] = 0;
     game_state.LEDScores[0] = 0;
     game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].position = BOTTOM;
+    game_state.players[0].x = 37;
+    game_state.players[0].y = 37;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].position = TOP;
+    game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
+    game_state.players[1].y = 37;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
@@ -472,11 +480,13 @@ extern void CreateGame(void){
 }
 
 extern void ReadJoystickHost(void){
-    int16_t displacement = 0;
+    int16_t displacement_x = 0;
+    int16_t displacement_y = 0;
     while(1){
         GetJoystickCoordinates(&joystick_host_x_coor, &joystick_host_y_coor);
         // do we need to bias the value?
-        displacement = joystick_host_x_coor / -4096;
+        displacement_x = joystick_host_x_coor / -4096;
+        displacement_y = joystick_host_y_coor / 4096;
 
 //        if(joystick_host_x_coor > 8000)
 //        {
@@ -494,8 +504,9 @@ extern void ReadJoystickHost(void){
 //        {
 //            displacement = 1;
 //        }
-        game_state.players[0].currentCenter += displacement; // update player 0 who is the host players is part of game state struct
-        game_state.players[1].currentCenter += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
+        game_state.players[0].x += displacement_x; // update player 0 who is the host players is part of game state struct
+        game_state.players[0].y += displacement_y;
+        game_state.players[1].x += client_displacement; // update player 1 simultaneously to guarantee paddle move speed
 
         sleep(10);
     }
@@ -536,10 +547,10 @@ void MoveBall() {
 
     game_state.balls[ball_index].color = LCD_WHITE;
 
-    game_state.balls[ball_index].currentCenterX = game_state.players[0].currentCenter+PLAYER_LEN_D2;
+    game_state.balls[ball_index].currentCenterX = game_state.players[0].x+PLAYER_LEN_D2;
 //            (rand() % (HORIZ_CENTER_MAX_BALL - HORIZ_CENTER_MIN_BALL)) +
 //            HORIZ_CENTER_MIN_BALL;
-    game_state.balls[ball_index].currentCenterY = ARENA_MAX_Y-PLAYER_WID_D2;
+    game_state.balls[ball_index].currentCenterY = game_state.players[0].y-PLAYER_WID_D2;
 //            (rand() % (VERT_CENTER_MAX_BALL - VERT_CENTER_MIN_BALL)) +
 //            VERT_CENTER_MIN_BALL;
 
@@ -585,43 +596,45 @@ void MoveBall() {
 
         // Collision checking
 
-        // left wall
-        {
-            int32_t w = (BALL_SIZE + BOUNDARY_WIDTH) / 2;
-            int32_t h = (BALL_SIZE + (ARENA_MAX_Y - ARENA_MIN_Y));
-            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
-                    (ARENA_MIN_X - 2);
-            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
-                    (ARENA_MAX_Y - ARENA_MIN_Y)/2;
-            if(abs(dx) <= w && abs(dy) <= h)
-            {
-                predictedCenterX = 2*ARENA_MIN_X - game_state.balls[ball_index].currentCenterX + velocity_x;
-                predictedCenterY = game_state.balls[ball_index].currentCenterY;
-                // bounce the ball off of the left wall
-                velocity_x = -velocity_x;
-                wall_collision_already_detected = true;
-            }
-        }
+//
+//        // left wall
+//        {
+//            int32_t w = (BALL_SIZE + BOUNDARY_WIDTH) / 2;
+//            int32_t h = (BALL_SIZE + (ARENA_MAX_Y - ARENA_MIN_Y));
+//            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
+//                    (ARENA_MIN_X - 2);
+//            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
+//                    (ARENA_MAX_Y - ARENA_MIN_Y)/2;
+//            if(abs(dx) <= w && abs(dy) <= h)
+//            {
+//                predictedCenterX = 2*ARENA_MIN_X - game_state.balls[ball_index].currentCenterX + velocity_x;
+//                predictedCenterY = game_state.balls[ball_index].currentCenterY;
+//                // bounce the ball off of the left wall
+//                velocity_x = -velocity_x;
+//                wall_collision_already_detected = true;
+//            }
+//        }
+//
+//        // right wall
+//        {
+//            int32_t w = (BALL_SIZE + BOUNDARY_WIDTH) / 2;
+//            int32_t h = (BALL_SIZE + (ARENA_MAX_Y - ARENA_MIN_Y)) / 2;
+//            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
+//                    (ARENA_MAX_X + 2);
+//            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
+//                    (ARENA_MAX_Y - ARENA_MIN_Y)/2;
+//            if(abs(dx) <= w && abs(dy) <= h)
+//            {
+//                predictedCenterX = 2*ARENA_MAX_X - game_state.balls[ball_index].currentCenterX + velocity_x;
+//                predictedCenterY = game_state.balls[ball_index].currentCenterY + velocity_y;
+//                // bounce the ball off of the left wall
+//                velocity_x = -velocity_x;
+//                wall_collision_already_detected = true;
+//            }
+//        }
+//
+//        // paddle 0
 
-        // right wall
-        {
-            int32_t w = (BALL_SIZE + BOUNDARY_WIDTH) / 2;
-            int32_t h = (BALL_SIZE + (ARENA_MAX_Y - ARENA_MIN_Y)) / 2;
-            int32_t dx = game_state.balls[ball_index].currentCenterX + velocity_x -
-                    (ARENA_MAX_X + 2);
-            int32_t dy = game_state.balls[ball_index].currentCenterY + velocity_y -
-                    (ARENA_MAX_Y - ARENA_MIN_Y)/2;
-            if(abs(dx) <= w && abs(dy) <= h)
-            {
-                predictedCenterX = 2*ARENA_MAX_X - game_state.balls[ball_index].currentCenterX + velocity_x;
-                predictedCenterY = game_state.balls[ball_index].currentCenterY + velocity_y;
-                // bounce the ball off of the left wall
-                velocity_x = -velocity_x;
-                wall_collision_already_detected = true;
-            }
-        }
-
-        // paddle 0
 //        {
 //            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
 //            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
@@ -643,7 +656,8 @@ void MoveBall() {
 //            }
 //        }
 
-        // paddle 1
+//
+//        // paddle 1
 //        {
 //            int32_t w = (BALL_SIZE + PADDLE_LEN) / 2;
 //            int32_t h = (BALL_SIZE + PADDLE_WID) / 2;
@@ -663,7 +677,8 @@ void MoveBall() {
 //                game_state.balls[ball_index].color = game_state.players[1].color;
 //            }
 //        }
-        // bottom wall
+
+//        // bottom wall
 //        {
 //            if(game_state.balls[ball_index].currentCenterY  > BOTTOM_PLAYER_CENTER_Y)// BOTTOM_PLAYER_CENTER_Y
 //            {
@@ -688,30 +703,31 @@ void MoveBall() {
 //            }
 //        }
 
-        // top wall
-        {
-            if(game_state.balls[ball_index].currentCenterY  < TOP_PLAYER_CENTER_Y) // TOP_PLAYER_CENTER_Y
-            {
-                // kill ball
-                game_state.balls[ball_index].kill_me = true;
-                if(game_state.balls[ball_index].color == game_state.players[0].color)
-                {
-                    // increment score for bottom player
-                    game_state.LEDScores[0]++;
-                    if(game_state.LEDScores[0] >= MAX_LED_SCORE)
-                    {
-                        winner = game_state.players[0].color;
-                        game_state.overallScores[0]++;
-                        game_state.winner = true;
-                        update_game_score = true;
-//                        G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
-                    }
-                    G8RTOS_SignalSemaphore(&led_mutex);
-                }
-                G8RTOS_KillSelf();
-                while(1);
-            }
-        }
+//
+//        // top wall
+//        {
+//            if(game_state.balls[ball_index].currentCenterY  < TOP_PLAYER_CENTER_Y) // TOP_PLAYER_CENTER_Y
+//            {
+//                // kill ball
+//                game_state.balls[ball_index].kill_me = true;
+//                if(game_state.balls[ball_index].color == game_state.players[0].color)
+//                {
+//                    // increment score for bottom player
+//                    game_state.LEDScores[0]++;
+//                    if(game_state.LEDScores[0] >= MAX_LED_SCORE)
+//                    {
+//                        winner = game_state.players[0].color;
+//                        game_state.overallScores[0]++;
+//                        game_state.winner = true;
+//                        update_game_score = true;
+////                        G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+//                    }
+//                    G8RTOS_SignalSemaphore(&led_mutex);
+//                }
+//                G8RTOS_KillSelf();
+//                while(1);
+//            }
+//        }
 
         sleep(35); //sleep for 35
     }
@@ -778,15 +794,16 @@ void EndOfGameHost() {
             game_state.gameDone = false;
             for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
             {
-                game_state.players[i].currentCenter = PADDLE_X_CENTER; // start with paddles in center of screen
                 game_state.LEDScores[i] = 0;
             }
             game_state.LEDScores[0] = 0;
             game_state.LEDScores[1] = 0;
             game_state.players[0].color = PLAYER_BLUE;
-            game_state.players[0].position = BOTTOM;
+            game_state.players[0].x = 37;
+            game_state.players[0].y = 37;
             game_state.players[1].color = PLAYER_RED;
-            game_state.players[1].position = TOP;
+            game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
+            game_state.players[1].y = 37;
 
             // draw init board (draw arena, players, and scores)
 
@@ -1014,7 +1031,6 @@ extern void JoinGame(void) {
     game_state.gameDone = false;
     for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
     {
-        game_state.players[i].currentCenter = PADDLE_X_CENTER; // start with paddles in center of screen
         game_state.LEDScores[i] = 0;
     }
     game_state.overallScores[0] = 0;
@@ -1022,9 +1038,11 @@ extern void JoinGame(void) {
     game_state.LEDScores[0] = 0;
     game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].position = BOTTOM;
+    game_state.players[0].x = 37;
+    game_state.players[0].y = 37;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].position = TOP;
+    game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
+    game_state.players[1].y = 37;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();

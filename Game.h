@@ -156,10 +156,10 @@ typedef struct
  */
 typedef struct
 {
-    int16_t currentCenter;
     uint16_t color;
     uint16_t *texture;
-    playerPosition position;
+    int16_t x;
+    int16_t y;
 } GeneralPlayerInfo_t;
 
 /*
@@ -204,7 +204,8 @@ typedef struct
  */
 typedef struct
 {
-    int16_t Center;
+    int16_t x;
+    int16_t y;
 }PrevPlayer_t;
 /*********************************************** Data Structures ********************************************************************/
 
