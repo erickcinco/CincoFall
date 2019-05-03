@@ -964,6 +964,7 @@ void MoveBall_client() {
         Point position = {game_state.balls[ball_index].currentCenterX,
                           game_state.balls[ball_index].currentCenterY};
 
+        // check for collision with player
         for(int i = 0; i < NUM_OF_PLAYERS_PLAYING; i++)
         {
             if(i == player_origin_index)
@@ -975,22 +976,35 @@ void MoveBall_client() {
                                   PLAYER_LEN,
                                   0
             };
+
             collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &temp);
 
             if(dir != none)
             {
                 game_state.overallScores[i]--;
-                G8RTOS_SignalSemaphore(&led_mutex);
-                // TODO: Keep a win count here.
-
                 if(game_state.overallScores[i] == 0)
                 {
                     game_state.winner = true;
-//                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+        //                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
                 }
 
+                G8RTOS_SignalSemaphore(&led_mutex);
+                // TODO: Keep a win count here.
+
                 game_state.balls[ball_index].kill_me = true;
-                goto client_ball_sleep;
+                goto ball_sleep;
+            }
+        }
+
+        // check for collision with pieces of the stage
+        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+        {
+            collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &stage_1[i]);
+
+            if(dir != none)
+            {
+                game_state.balls[ball_index].kill_me = true;
+                goto ball_sleep;
             }
         }
 
@@ -1000,7 +1014,8 @@ void MoveBall_client() {
         game_state.balls[ball_index].currentCenterY += velocity_y;
 
 
-        client_ball_sleep:
+        ball_sleep:
+
         sleep(35); //sleep for 35
     }
 }
