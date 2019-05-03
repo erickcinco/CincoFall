@@ -50,6 +50,7 @@ int16_t client_displacement_x; // global variable for host
 int16_t client_displacement_y; // global variable for host
 
 ball_dir client_new_ball_dir = BALL_none;
+endGameAction progress_type = NOTHING;
 
 bool fire_delay = false;
 
@@ -201,14 +202,14 @@ void DrawObjects(void){
             }
         }
 
-        // update paddles
-        if((game_state.players[1].x != prev_red_x.x) ||
-           (game_state.players[1].y != prev_red_x.y))
+        // update player sprites
+//        if((game_state.players[1].x != prev_red_x.x) ||
+//           (game_state.players[1].y != prev_red_x.y))
         {
             UpdatePlayerOnScreen(&prev_red_x, &(game_state.players[1]));
         }
-        if((game_state.players[0].x != prev_blue_x.x) ||
-           (game_state.players[0].y != prev_blue_x.y))
+//        if((game_state.players[0].x != prev_blue_x.x) ||
+//           (game_state.players[0].y != prev_blue_x.y))
         {
             UpdatePlayerOnScreen(&prev_blue_x, &(game_state.players[0]));
         }
@@ -318,71 +319,72 @@ void MoveLEDs(void){
 //                red_score = BIT0 | BIT1 | BIT2;
 //                break;
 //        }
-        switch(game_state.overallScores[1])
-        {
-            case 0:
-                red_score = 0;
-                break;
-            case 1:
-                red_score = BIT0 ;
-                break;
-            case 2:
-                red_score = BIT0 | BIT1;
-                break;
-            case 3:
-                red_score = BIT0 | BIT1 | BIT2;
-                break;
-            case 4:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3;
-                break;
-            case 5:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
-                break;
-            case 6:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
-                break;
-            case 7:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
-                break;
-            case 8:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
-                break;
-        }
-
         switch(game_state.overallScores[0])
         {
             case 0:
                 blue_score = 0;
                 break;
             case 1:
-                blue_score = BITF;
+                blue_score = BIT0 ;
                 break;
             case 2:
-                blue_score = BITF | BITE;
+                blue_score = BIT0 | BIT1;
                 break;
             case 3:
-                blue_score = BITF | BITE | BITD;
+                blue_score = BIT0 | BIT1 | BIT2;
                 break;
             case 4:
-                blue_score = BITF | BITE | BITD | BITC;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3;
                 break;
             case 5:
-                blue_score = BITF | BITE | BITD | BITC | BITB;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
                 break;
             case 6:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
                 break;
             case 7:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
                 break;
             case 8:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
+            default:
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
+                break;
+        }
+
+        switch(game_state.overallScores[1])
+        {
+            case 0:
+                red_score = 0;
+                break;
+            case 1:
+                red_score = BITF;
+                break;
+            case 2:
+                red_score = BITF | BITE;
+                break;
+            case 3:
+                red_score = BITF | BITE | BITD;
+                break;
+            case 4:
+                red_score = BITF | BITE | BITD | BITC;
+                break;
+            case 5:
+                red_score = BITF | BITE | BITD | BITC | BITB;
+                break;
+            case 6:
+                red_score = BITF | BITE | BITD | BITC | BITB | BITA;
+                break;
+            case 7:
+                red_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
+                break;
+            case 8:
+            default:
+                red_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
                 break;
         }
 
         LP3943_LedModeSet(RED, red_score);
         LP3943_LedModeSet(BLUE, blue_score);
-//        G8RTOS_KillSelf();
     }
 }
 
@@ -411,16 +413,16 @@ extern void CreateGame(void){
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.overallScores[0] = 3;
-    game_state.overallScores[1] = 3;
+    game_state.overallScores[0] = NUM_INITIAL_LIVES;
+    game_state.overallScores[1] = NUM_INITIAL_LIVES;
 //    game_state.LEDScores[0] = 0;
 //    game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].x = 30;
-    game_state.players[0].y = 30;
+    game_state.players[0].x = HOST_PLAYER_START_X;
+    game_state.players[0].y = HOST_PLAYER_START_Y;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].x = MAX_SCREEN_X - 30 - PLAYER_WID;
-    game_state.players[1].y = 30;
+    game_state.players[1].x = CLIENT_PLAYER_START_X;
+    game_state.players[1].y = CLIENT_PLAYER_START_Y;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
@@ -453,12 +455,12 @@ extern void CreateGame(void){
     G8RTOS_AddThread(SendDataToClient, 1, "Tx2Client");
     G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
 
-    P4DIR &= ~(BIT4 ); // Set P4 as input
-    P4IFG &= ~(BIT4 ); // P4.0 IFG cleared
-    P4IE  |= BIT4 ;  // Enable interrupt on P4.0
-    P4IES |= BIT4 ;  // high-to-low transition
-    P4REN |= BIT4 ;  // Pull-up resistor
-    P4OUT |= BIT4 ;  // Sets res to pull-up
+    P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
+    P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
+    P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
+    P4IES |= BIT4 | BIT5;  // high-to-low transition
+    P4REN |= BIT4 | BIT5;  // Pull-up resistor
+    P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
 
     NVIC_EnableIRQ(PORT4_IRQn); // enable the interrupt
     G8RTOS_AddAPeriodicEvent(fight_button_press, 1, PORT4_IRQn);
@@ -642,6 +644,11 @@ void MoveBall_host() {
         velocity_x = 0;
         velocity_y = -MAX_BALL_SPEED;
     }
+    else // if stationary, fire as though it's going RIGHT when host
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = 0;
+    }
 
 //    if(joystick_host_x_coor > 8000 && joystick_client_y_coor < 8000)
 //    {
@@ -697,7 +704,7 @@ void MoveBall_host() {
                 if(game_state.overallScores[i] == 0)
                 {
                     game_state.winner = true;
-                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+//                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
                 }
 
                 game_state.balls[ball_index].kill_me = true;
@@ -935,14 +942,20 @@ void MoveBall_client() {
         velocity_x = 0;
         velocity_y = -MAX_BALL_SPEED;
     }
-    else
+    else // if stationary, fire as though it's going LEFT when client
     {
-        velocity_x = 0;
+        velocity_x = -MAX_BALL_SPEED;
         velocity_y = 0;
     }
 
     while(1)
     {
+        if(game_state.balls[ball_index].kill_me ||
+           !game_state.balls[ball_index].alive)
+        {
+            G8RTOS_KillSelf();
+            while(1);
+        }
         static int16_t predictedCenterX = 0;
         static int16_t predictedCenterY = 0;
         static bool collision_predicted = false;
@@ -951,6 +964,7 @@ void MoveBall_client() {
         Point position = {game_state.balls[ball_index].currentCenterX,
                           game_state.balls[ball_index].currentCenterY};
 
+        // check for collision with player
         for(int i = 0; i < NUM_OF_PLAYERS_PLAYING; i++)
         {
             if(i == player_origin_index)
@@ -962,22 +976,35 @@ void MoveBall_client() {
                                   PLAYER_LEN,
                                   0
             };
+
             collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &temp);
 
             if(dir != none)
             {
                 game_state.overallScores[i]--;
-                G8RTOS_SignalSemaphore(&led_mutex);
-                // TODO: Keep a win count here.
-
                 if(game_state.overallScores[i] == 0)
                 {
                     game_state.winner = true;
-                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
+        //                    G8RTOS_AddThread(EndOfGameHost, 1, "EndGameHost");
                 }
 
+                G8RTOS_SignalSemaphore(&led_mutex);
+                // TODO: Keep a win count here.
+
                 game_state.balls[ball_index].kill_me = true;
-                goto client_ball_sleep;
+                goto ball_sleep;
+            }
+        }
+
+        // check for collision with pieces of the stage
+        for(int i = 0; i < (sizeof(stage_1)/sizeof(0[stage_1])); i++)
+        {
+            collision_dir dir = check_collision(position, BALL_SIZE, BALL_SIZE, velocity_x, velocity_y, &stage_1[i]);
+
+            if(dir != none)
+            {
+                game_state.balls[ball_index].kill_me = true;
+                goto ball_sleep;
             }
         }
 
@@ -987,7 +1014,8 @@ void MoveBall_client() {
         game_state.balls[ball_index].currentCenterY += velocity_y;
 
 
-        client_ball_sleep:
+        ball_sleep:
+
         sleep(35); //sleep for 35
     }
 }
@@ -1008,27 +1036,19 @@ void EndOfGameHost() {
         G8RTOS_InitSemaphore(&led_mutex, 1);
         G8RTOS_InitSemaphore(&lcd_SPI, 1);
 
+        if(game_state.overallScores[0] > game_state.overallScores[1])
+            winner = 0;
+        else
+            winner = 1;
 
-
-
-        // clear screen with winner's color Print some message that waits for the host's action to start a new game
+        // clear screen and print some message about who won while waiting for the host's action to start a new game
         host_end_game_screen();
 
         //Create an aperiodic thread that waits for the host's button press (the client will just be waiting on the host to start a new game)
         check_end_game_buttons = true;
 
-
-        /* Configure low true interrupt on P4.0 for TP */
-        P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
-        P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
-        P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
-        P4IES |= BIT4 | BIT5;  // high-to-low transition
-        P4REN |= BIT4 | BIT5;  // Pull-up resistor
-        P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
-
-        NVIC_EnableIRQ(PORT4_IRQn); // enable the interrupt
-
-        G8RTOS_AddAPeriodicEvent(end_game_button_press, 1, PORT4_IRQn);
+        // todo do we need this
+        P4->IE |= BIT4 | BIT5; // renable interrupt
 
         while(end_game_action == NOTHING);
 
@@ -1051,16 +1071,14 @@ void EndOfGameHost() {
             game_state.gameDone = false;
             for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
             {
-                game_state.LEDScores[i] = 0;
+                game_state.overallScores[i] = NUM_INITIAL_LIVES;
             }
-            game_state.LEDScores[0] = 0;
-            game_state.LEDScores[1] = 0;
             game_state.players[0].color = PLAYER_BLUE;
-            game_state.players[0].x = 37;
-            game_state.players[0].y = 37;
+            game_state.players[0].x = HOST_PLAYER_START_X;
+            game_state.players[0].y = HOST_PLAYER_START_Y;
             game_state.players[1].color = PLAYER_RED;
-            game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
-            game_state.players[1].y = 37;
+            game_state.players[1].x = CLIENT_PLAYER_START_X;
+            game_state.players[1].y = CLIENT_PLAYER_START_Y;
 
             // draw init board (draw arena, players, and scores)
 
@@ -1085,6 +1103,15 @@ void EndOfGameHost() {
             G8RTOS_AddThread(ReceiveDataFromClient, 1, "RxFrmClient");
             G8RTOS_AddThread(idle_thread, 254, "idle");
 
+            P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
+            P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
+            P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
+            P4IES |= BIT4 | BIT5;  // high-to-low transition
+            P4REN |= BIT4 | BIT5;  // Pull-up resistor
+            P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
+
+            NVIC_EnableIRQ(PORT4_IRQn); // reenable the interrupt
+
 
         }
         else if(end_game_action == QUIT)
@@ -1108,6 +1135,8 @@ void quit_screen_host(void){
 
     G8RTOS_WaitSemaphore(&lcd_SPI);
     color_screen(BACK_COLOR); // clear arena
+    G8RTOS_SignalSemaphore(&lcd_SPI);
+
 
     if(winner == 0)
         LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2-20, "Host wins!", LCD_ORANGE);
@@ -1128,11 +1157,10 @@ void quit_screen_client(void){
     uint8_t final_message_lose[] = "LOSER! :("; // 70, 10 for each char
     uint8_t final_message_win[] = "WINNER! :)"; // 70, 10 for each char
 
-
-
     G8RTOS_WaitSemaphore(&lcd_SPI);
     color_screen(BACK_COLOR);
     G8RTOS_SignalSemaphore(&lcd_SPI);
+
     if(winner == LCD_BLUE)
     {
         G8RTOS_WaitSemaphore(&lcd_SPI);
@@ -1144,9 +1172,7 @@ void quit_screen_client(void){
         LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2, final_message_win, LCD_PINK);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
-//    G8RTOS_WaitSemaphore(&lcd_SPI);
-//    LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2, final_message, LCD_PINK);
-//    G8RTOS_SignalSemaphore(&lcd_SPI);
+
 }
 
 void color_screen(uint16_t winner_color){
@@ -1159,14 +1185,19 @@ void host_end_game_screen(void){
     uint8_t play_again_message[] = "Press B0 to play again!";// 230 10 for each char
     uint8_t quit_game_message[] = "Press B1 to quit!"; // 170 10 for each char
 
-    color_screen(winner); // clear arena with color of winning player
-
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 90)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/4, play_again_message, LCD_WHITE);
-    G8RTOS_SignalSemaphore(&lcd_SPI);
+    {
+        color_screen(BACK_COLOR);
 
-    G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2 , quit_game_message, LCD_WHITE);
+        if(winner == 0)
+            LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2+20, "Host wins!", LCD_ORANGE);
+        else
+            LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2+20, "Client wins!", LCD_ORANGE);
+
+        LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 90)/2 - 30, (ARENA_MAX_Y - ARENA_MIN_Y)/4, play_again_message, LCD_WHITE);
+
+        LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2 - 25, (ARENA_MAX_Y - ARENA_MIN_Y)/2 , quit_game_message, LCD_WHITE);
+    }
     G8RTOS_SignalSemaphore(&lcd_SPI);
 
 }
@@ -1286,16 +1317,16 @@ extern void JoinGame(void) {
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.overallScores[0] = 0;
-    game_state.overallScores[1] = 0;
-    game_state.LEDScores[0] = 0;
-    game_state.LEDScores[1] = 0;
+    game_state.overallScores[0] = NUM_INITIAL_LIVES;
+    game_state.overallScores[1] = NUM_INITIAL_LIVES;
+//    game_state.LEDScores[0] = 0;
+//    game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].x = 37;
-    game_state.players[0].y = 37;
+    game_state.players[0].x = HOST_PLAYER_START_X;
+    game_state.players[0].y = HOST_PLAYER_START_Y;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
-    game_state.players[1].y = 37;
+    game_state.players[1].x = CLIENT_PLAYER_START_X;
+    game_state.players[1].y = CLIENT_PLAYER_START_Y;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
@@ -1306,10 +1337,10 @@ extern void JoinGame(void) {
     }
 
     // init semaphores
-    G8RTOS_InitSemaphore(&led_mutex, 0);
+    G8RTOS_InitSemaphore(&led_mutex, 1);
     // semaphore init shit
     // LED I2C mutex
-    G8RTOS_InitSemaphore(&led_I2C, 0);
+    G8RTOS_InitSemaphore(&led_I2C, 1);
 
     // sensor I2C mutex
     G8RTOS_InitSemaphore(&sensor_I2C, 1);
@@ -1328,12 +1359,12 @@ extern void JoinGame(void) {
     G8RTOS_AddThread(MoveLEDs, 1, "MoveLed");
     G8RTOS_AddThread(idle_thread, 254, "idle");
 
-    P4DIR &= ~(BIT4 ); // Set P4 as input
-    P4IFG &= ~(BIT4 ); // P4.0 IFG cleared
-    P4IE  |= BIT4 ;  // Enable interrupt on P4.0
-    P4IES |= BIT4 ;  // high-to-low transition
-    P4REN |= BIT4 ;  // Pull-up resistor
-    P4OUT |= BIT4 ;  // Sets res to pull-up
+    P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
+    P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
+    P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
+    P4IES |= BIT4 | BIT5;  // high-to-low transition
+    P4REN |= BIT4 | BIT5;  // Pull-up resistor
+    P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
 
     NVIC_EnableIRQ(PORT4_IRQn); // enable the interrupt
     G8RTOS_AddAPeriodicEvent(fight_button_press, 1, PORT4_IRQn);
@@ -1533,6 +1564,7 @@ void EndOfGameClient() {
                 // reset game variables
                 client_player.displacement_x = 0;
                 client_player.displacement_y = 0;
+                client_player.ball_direction = BALL_none;
                 // draw init board (draw arena, players, and scores)
                 color_screen(BACK_COLOR); // clear arena with back color
                 DrawBoundary();
@@ -1548,6 +1580,15 @@ void EndOfGameClient() {
                 G8RTOS_AddThread(ReadJoystickClient, 1, "JoyClient");
                 G8RTOS_AddThread(DrawObjects, 1, "DrawObj");
                 G8RTOS_AddThread(idle_thread, 254, "idle");
+
+                P4DIR &= ~(BIT4 | BIT5); // Set P4 as input
+                P4IFG &= ~(BIT4 | BIT5); // P4.0 IFG cleared
+                P4IE  |= BIT4 | BIT5;  // Enable interrupt on P4.0
+                P4IES |= BIT4 | BIT5;  // high-to-low transition
+                P4REN |= BIT4 | BIT5;  // Pull-up resistor
+                P4OUT |= BIT4 | BIT5;  // Sets res to pull-up
+
+                NVIC_EnableIRQ(PORT4_IRQn); // reenable the interrupt
             }
             else if(game_state.gameDone == true && game_state.winner == true)
             {
@@ -1587,68 +1628,85 @@ void client_end_game_screen(){
 
 
 void fight_button_press(void){
-
-    if(P4->IFG & BIT4 && fire_delay == false)
+    if(game_state.winner == false && game_state.gameDone == false)
     {
-        P4->IE &= ~(BIT4); // turn off interrupt
-        fire_delay = true;
-        test = G8RTOS_AddThread(FireWait, 1, "FireWait");
-        if(GetPlayerRole() == Host)
+        if(P4->IFG & BIT4 && fire_delay == false)
         {
-            game_state.numberOfBalls++;
-            test = G8RTOS_AddThread(MoveBall_host, 1, "MoveBall_host");
-        }
-        else
-        {
-            client_player.spawn_ball = true;
-            if(joystick_client_x_coor < -4000 && joystick_client_y_coor > 4000) // up right
+            P4->IE &= ~(BIT4); // turn off interrupt
+            fire_delay = true;
+            test = G8RTOS_AddThread(FireWait, 1, "FireWait");
+            if(GetPlayerRole() == Host)
             {
-                client_player.ball_direction = BALL_UP_RIGHT;
-
-            }
-            else if(joystick_client_x_coor > 4000 && joystick_client_y_coor > 4000) // up left
-            {
-                client_player.ball_direction = BALL_UP_LEFT;
-
-            }
-            else if(joystick_client_x_coor < -4000 && joystick_client_y_coor < -4000) // down right
-            {
-                client_player.ball_direction = BALL_DOWN_RIGHT;
-
-            }
-            else if(joystick_client_x_coor > 4000 && joystick_client_y_coor < -4000) // down left
-            {
-                client_player.ball_direction = BALL_DOWN_LEFT;
-
-            }
-            else if(joystick_client_x_coor < -4000 && joystick_client_y_coor < 1000) // right
-            {
-                client_player.ball_direction = BALL_RIGHT;
-
-            }
-            else if(joystick_client_x_coor > 4000 && joystick_client_y_coor < 1000) // left
-            {
-                client_player.ball_direction = BALL_LEFT;
-
-            }
-            else if(joystick_client_x_coor < 1000 && joystick_client_y_coor > 4000) // up
-            {
-                client_player.ball_direction = BALL_UP;
-
-            }
-            else if(joystick_client_x_coor < 1000 && joystick_client_y_coor < -4000) // down
-            {
-                client_player.ball_direction = BALL_DOWN;
+                game_state.numberOfBalls++;
+                test = G8RTOS_AddThread(MoveBall_host, 1, "MoveBall_host");
             }
             else
             {
-                client_player.ball_direction = BALL_none;
-            }
+                client_player.spawn_ball = true;
+                if(joystick_client_x_coor < -4000 && joystick_client_y_coor > 4000) // up right
+                {
+                    client_player.ball_direction = BALL_UP_RIGHT;
 
+                }
+                else if(joystick_client_x_coor > 4000 && joystick_client_y_coor > 4000) // up left
+                {
+                    client_player.ball_direction = BALL_UP_LEFT;
+
+                }
+                else if(joystick_client_x_coor < -4000 && joystick_client_y_coor < -4000) // down right
+                {
+                    client_player.ball_direction = BALL_DOWN_RIGHT;
+
+                }
+                else if(joystick_client_x_coor > 4000 && joystick_client_y_coor < -4000) // down left
+                {
+                    client_player.ball_direction = BALL_DOWN_LEFT;
+
+                }
+                else if(joystick_client_x_coor < -4000 && joystick_client_y_coor < 1000) // right
+                {
+                    client_player.ball_direction = BALL_RIGHT;
+
+                }
+                else if(joystick_client_x_coor > 4000 && joystick_client_y_coor < 1000) // left
+                {
+                    client_player.ball_direction = BALL_LEFT;
+
+                }
+                else if(joystick_client_x_coor < 1000 && joystick_client_y_coor > 4000) // up
+                {
+                    client_player.ball_direction = BALL_UP;
+
+                }
+                else if(joystick_client_x_coor < 1000 && joystick_client_y_coor < -4000) // down
+                {
+                    client_player.ball_direction = BALL_DOWN;
+                }
+                else
+                {
+                    client_player.ball_direction = BALL_none;
+                }
+
+            }
         }
     }
-    P4->IFG &= ~(BIT4); // clear flag
+    else if(check_end_game_buttons == true && game_state.winner == true && game_state.gameDone == false)
+    {
+        if(P4->IFG & BIT4)
+        {
+            P4->IE &= ~(BIT4);
+            end_game_action = RESTART;
+        }
+        else if(P4->IFG & BIT5)
+        {
+            P4->IE &= ~(BIT5);
+            end_game_action = QUIT;
+        }
+        check_end_game_buttons = false;
 
+    }
+
+    P4->IFG &= ~(BIT4 | BIT5); // clear flag
 }
 
 void FireWait(void){

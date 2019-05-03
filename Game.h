@@ -56,6 +56,15 @@
 #define PLAYER_WID                   FIGHTER_CAT_SPRITE_HEIGHT
 #define PLAYER_WID_D2                (PLAYER_WID >> 1)
 
+// number of lives initially
+#define NUM_INITIAL_LIVES 3
+
+// Initial player positions
+#define HOST_PLAYER_START_X 25
+#define HOST_PLAYER_START_Y 25
+#define CLIENT_PLAYER_START_X (MAX_SCREEN_X - HOST_PLAYER_START_X - PLAYER_WID)
+#define CLIENT_PLAYER_START_Y HOST_PLAYER_START_Y
+
 // start out in the middle of respective side of stage
 #define PLAYER_1_CENTER              MAX_SCREEN_X >> 2
 #define PLAYER_2_CENTER              MAX_SCREEN_X - (MAX_SCREEN_X >> 2) - FIGHTER_CAT_SPRITE_WIDTH
@@ -98,7 +107,7 @@
 #define VERT_CENTER_MIN_BALL         (ARENA_MIN_Y + BALL_SIZE_D2)
 
 /* Maximum ball speed */
-#define MAX_BALL_SPEED               6
+#define MAX_BALL_SPEED               4
 
 /* Background color - Black */
 #define BACK_COLOR                   LCD_BLACK
@@ -132,6 +141,7 @@ typedef enum
     RESTART = 1,
     QUIT = 2
 }endGameAction;
+
 
 typedef enum {BALL_none, BALL_UP_RIGHT, BALL_UP_LEFT, BALL_DOWN_RIGHT, BALL_DOWN_LEFT, BALL_RIGHT, BALL_LEFT, BALL_UP, BALL_DOWN} ball_dir;
 
