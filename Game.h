@@ -26,6 +26,10 @@
 /*********************************************** Externs ********************************************************************/
 
 /*********************************************** Global Defines ********************************************************************/
+
+// Pick which map and texture pack you want, currently there are only 0 or 1
+#define MAP_CHOICE 1
+
 #define MAX_NUM_OF_PLAYERS  2
 #define MAX_NUM_OF_BALLS    10
 
