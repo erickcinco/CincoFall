@@ -1133,7 +1133,7 @@ void EndOfGameHost() {
 void quit_screen_host(void){
 
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    color_screen(BACK_COLOR); // clear arena
+    LCD_Clear(BACK_COLOR); // clear arena
     G8RTOS_SignalSemaphore(&lcd_SPI);
 
     if(winner == 0)
@@ -1155,7 +1155,7 @@ void quit_screen_client(void){
     uint8_t final_message_win[] = "WINNER! :)"; // 70, 10 for each char
 
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    color_screen(BACK_COLOR);
+    LCD_Clear(BACK_COLOR); // clear arena
     G8RTOS_SignalSemaphore(&lcd_SPI);
 
     if(winner == 0)
