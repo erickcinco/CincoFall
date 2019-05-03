@@ -202,14 +202,14 @@ void DrawObjects(void){
             }
         }
 
-        // update paddles
-        if((game_state.players[1].x != prev_red_x.x) ||
-           (game_state.players[1].y != prev_red_x.y))
+        // update player sprites
+//        if((game_state.players[1].x != prev_red_x.x) ||
+//           (game_state.players[1].y != prev_red_x.y))
         {
             UpdatePlayerOnScreen(&prev_red_x, &(game_state.players[1]));
         }
-        if((game_state.players[0].x != prev_blue_x.x) ||
-           (game_state.players[0].y != prev_blue_x.y))
+//        if((game_state.players[0].x != prev_blue_x.x) ||
+//           (game_state.players[0].y != prev_blue_x.y))
         {
             UpdatePlayerOnScreen(&prev_blue_x, &(game_state.players[0]));
         }
