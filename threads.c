@@ -1505,7 +1505,7 @@ void ReceiveDataFromHost() {
 
             game_state = gamestate_from_host;
 
-            if(game_state.winner)
+            if(game_state.winner == true && game_state.gameDone == false)
             {
                 if(game_state.overallScores[0] > game_state.overallScores[1])
                 {
@@ -1543,6 +1543,11 @@ void EndOfGameClient() {
             G8RTOS_InitSemaphore(&WiFi_mutex, 1);
             G8RTOS_InitSemaphore(&led_mutex, 0);
             G8RTOS_InitSemaphore(&lcd_SPI, 1);
+
+            if(game_state.overallScores[0] > game_state.overallScores[1])
+                winner = 0;
+            else
+                winner = 1;
 
         // clear screen with winner's color
             client_end_game_screen();
