@@ -1139,13 +1139,13 @@ void quit_screen_host(void){
     if(winner == 0)
     {
         G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2-20, "Host wins!", LCD_ORANGE);
+        LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2-20, "WINNER! :)", LCD_ORANGE);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
     else
     {
         G8RTOS_WaitSemaphore(&lcd_SPI);
-        LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2-20, "Client wins!", LCD_ORANGE);
+        LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2-20, "LOSER! :(", LCD_ORANGE);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
 }
