@@ -412,16 +412,16 @@ extern void CreateGame(void){
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.overallScores[0] = 3;
-    game_state.overallScores[1] = 3;
+    game_state.overallScores[0] = NUM_INITIAL_LIVES;
+    game_state.overallScores[1] = NUM_INITIAL_LIVES;
 //    game_state.LEDScores[0] = 0;
 //    game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].x = 30;
-    game_state.players[0].y = 30;
+    game_state.players[0].x = HOST_PLAYER_START_X;
+    game_state.players[0].y = HOST_PLAYER_START_Y;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].x = MAX_SCREEN_X - 30 - PLAYER_WID;
-    game_state.players[1].y = 30;
+    game_state.players[1].x = CLIENT_PLAYER_START_X;
+    game_state.players[1].y = CLIENT_PLAYER_START_Y;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
@@ -1015,10 +1015,12 @@ void EndOfGameHost() {
         G8RTOS_InitSemaphore(&led_mutex, 1);
         G8RTOS_InitSemaphore(&lcd_SPI, 1);
 
+        if(game_state.overallScores[0] > game_state.overallScores[1])
+            winner = 0;
+        else
+            winner = 1;
 
-
-
-        // clear screen with winner's color Print some message that waits for the host's action to start a new game
+        // clear screen and print some message about who won while waiting for the host's action to start a new game
         host_end_game_screen();
 
         //Create an aperiodic thread that waits for the host's button press (the client will just be waiting on the host to start a new game)
@@ -1048,14 +1050,14 @@ void EndOfGameHost() {
             game_state.gameDone = false;
             for(uint16_t i=0; i<MAX_NUM_OF_PLAYERS; i++)
             {
-                game_state.overallScores[i] = 3;
+                game_state.overallScores[i] = NUM_INITIAL_LIVES;
             }
             game_state.players[0].color = PLAYER_BLUE;
-            game_state.players[0].x = 37;
-            game_state.players[0].y = 37;
+            game_state.players[0].x = HOST_PLAYER_START_X;
+            game_state.players[0].y = HOST_PLAYER_START_Y;
             game_state.players[1].color = PLAYER_RED;
-            game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
-            game_state.players[1].y = 37;
+            game_state.players[1].x = CLIENT_PLAYER_START_X;
+            game_state.players[1].y = CLIENT_PLAYER_START_Y;
 
             // draw init board (draw arena, players, and scores)
 
@@ -1163,16 +1165,18 @@ void host_end_game_screen(void){
     uint8_t quit_game_message[] = "Press B1 to quit!"; // 170 10 for each char
 
     G8RTOS_WaitSemaphore(&lcd_SPI);
-    color_screen(winner); // clear arena with color of winning player
-    G8RTOS_SignalSemaphore(&lcd_SPI);
+    {
+        color_screen(BACK_COLOR);
 
+        if(winner == 0)
+            LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2+20, "Host wins!", LCD_ORANGE);
+        else
+            LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2+20, "Client wins!", LCD_ORANGE);
 
-    G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 90)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/4, play_again_message, LCD_WHITE);
-    G8RTOS_SignalSemaphore(&lcd_SPI);
+        LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 90)/2 - 30, (ARENA_MAX_Y - ARENA_MIN_Y)/4, play_again_message, LCD_WHITE);
 
-    G8RTOS_WaitSemaphore(&lcd_SPI);
-    LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2 , quit_game_message, LCD_WHITE);
+        LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2 - 25, (ARENA_MAX_Y - ARENA_MIN_Y)/2 , quit_game_message, LCD_WHITE);
+    }
     G8RTOS_SignalSemaphore(&lcd_SPI);
 
 }
@@ -1292,16 +1296,16 @@ extern void JoinGame(void) {
     {
         game_state.LEDScores[i] = 0;
     }
-    game_state.overallScores[0] = 0;
-    game_state.overallScores[1] = 0;
-    game_state.LEDScores[0] = 0;
-    game_state.LEDScores[1] = 0;
+    game_state.overallScores[0] = NUM_INITIAL_LIVES;
+    game_state.overallScores[1] = NUM_INITIAL_LIVES;
+//    game_state.LEDScores[0] = 0;
+//    game_state.LEDScores[1] = 0;
     game_state.players[0].color = PLAYER_BLUE;
-    game_state.players[0].x = 37;
-    game_state.players[0].y = 37;
+    game_state.players[0].x = HOST_PLAYER_START_X;
+    game_state.players[0].y = HOST_PLAYER_START_Y;
     game_state.players[1].color = PLAYER_RED;
-    game_state.players[1].x = MAX_SCREEN_X - 37 - PLAYER_WID;
-    game_state.players[1].y = 37;
+    game_state.players[1].x = CLIENT_PLAYER_START_X;
+    game_state.players[1].y = CLIENT_PLAYER_START_Y;
 
     // draw init board (draw arena, players, and scores)
     DrawBoundary();
