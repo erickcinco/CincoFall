@@ -1095,7 +1095,6 @@ void EndOfGameHost() {
             G8RTOS_SignalSemaphore(&led_mutex);
 
             // add all threads back
-            G8RTOS_AddThread(GenerateBall, 1, "GenBall");
             G8RTOS_AddThread(DrawObjects, 1, "DrawObj");
             G8RTOS_AddThread(ReadJoystickHost, 1, "JoyHost");
             //Once ready, send notification to client, with the reinit gamestate
