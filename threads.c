@@ -1136,23 +1136,21 @@ void quit_screen_host(void){
     color_screen(BACK_COLOR); // clear arena
     G8RTOS_SignalSemaphore(&lcd_SPI);
 
-
     if(winner == 0)
+    {
+        G8RTOS_WaitSemaphore(&lcd_SPI);
         LCD_Text(MAX_SCREEN_X/2-40, MAX_SCREEN_Y/2-20, "Host wins!", LCD_ORANGE);
+        G8RTOS_SignalSemaphore(&lcd_SPI);
+    }
     else
+    {
+        G8RTOS_WaitSemaphore(&lcd_SPI);
         LCD_Text(MAX_SCREEN_X/2-45, MAX_SCREEN_Y/2-20, "Client wins!", LCD_ORANGE);
-
-    G8RTOS_SignalSemaphore(&lcd_SPI);
-
+        G8RTOS_SignalSemaphore(&lcd_SPI);
+    }
 }
 
 void quit_screen_client(void){
-
-
-
-//    uint8_t final_message[] = "Bye bye"; // 70, 10 for each char
-//    uint8_t final_message[20];
-
     uint8_t final_message_lose[] = "LOSER! :("; // 70, 10 for each char
     uint8_t final_message_win[] = "WINNER! :)"; // 70, 10 for each char
 
@@ -1171,7 +1169,6 @@ void quit_screen_client(void){
         LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2, final_message_win, LCD_PINK);
         G8RTOS_SignalSemaphore(&lcd_SPI);
     }
-
 }
 
 void color_screen(uint16_t winner_color){
@@ -1224,7 +1221,6 @@ void SendDataToClient(void) {
         {
             G8RTOS_KillSelf();
         }
-
         sleep(5);
     }
 }
