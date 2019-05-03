@@ -604,42 +604,42 @@ void MoveBall_host() {
 
     // Start with random velocity
 
-    if(joystick_host_x_coor < -4000 && joystick_client_y_coor > 4000) // up right
+    if(joystick_host_x_coor < -4000 && joystick_host_y_coor > 4000) // up right
     {
         velocity_x = MAX_BALL_SPEED;
         velocity_y = MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor > 4000 && joystick_client_y_coor > 4000) // up left
+    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor > 4000) // up left
     {
         velocity_x = -MAX_BALL_SPEED;
         velocity_y = MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor < -4000 && joystick_client_y_coor < -4000) // down right
+    else if(joystick_host_x_coor < -4000 && joystick_host_y_coor < -4000) // down right
     {
         velocity_x = MAX_BALL_SPEED;
         velocity_y = -MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor > 4000 && joystick_client_y_coor < -4000) // down left
+    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor < -4000) // down left
     {
         velocity_x = -MAX_BALL_SPEED;
         velocity_y = -MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor < -4000 && joystick_client_y_coor < 1000) // right
+    else if(joystick_host_x_coor < -4000 && joystick_host_y_coor < 1000) // right
     {
         velocity_x = MAX_BALL_SPEED;
         velocity_y = 0;
     }
-    else if(joystick_host_x_coor > 4000 && joystick_client_y_coor < 1000) // left
+    else if(joystick_host_x_coor > 4000 && joystick_host_y_coor < 1000) // left
     {
         velocity_x = -MAX_BALL_SPEED;
         velocity_y = 0;
     }
-    else if(joystick_host_x_coor < 1000 && joystick_client_y_coor > 4000) // up
+    else if(joystick_host_x_coor < 1000 && joystick_host_y_coor > 4000) // up
     {
         velocity_x = 0;
         velocity_y = MAX_BALL_SPEED;
     }
-    else if(joystick_host_x_coor < 1000 && joystick_client_y_coor < -4000) // down
+    else if(joystick_host_x_coor < 1000 && joystick_host_y_coor < -4000) // down
     {
         velocity_x = 0;
         velocity_y = -MAX_BALL_SPEED;
