@@ -644,6 +644,11 @@ void MoveBall_host() {
         velocity_x = 0;
         velocity_y = -MAX_BALL_SPEED;
     }
+    else // if stationary, fire as though it's going RIGHT when host
+    {
+        velocity_x = MAX_BALL_SPEED;
+        velocity_y = 0;
+    }
 
 //    if(joystick_host_x_coor > 8000 && joystick_client_y_coor < 8000)
 //    {
@@ -937,9 +942,9 @@ void MoveBall_client() {
         velocity_x = 0;
         velocity_y = -MAX_BALL_SPEED;
     }
-    else
+    else // if stationary, fire as though it's going LEFT when client
     {
-        velocity_x = 0;
+        velocity_x = -MAX_BALL_SPEED;
         velocity_y = 0;
     }
 
