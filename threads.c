@@ -1158,7 +1158,7 @@ void quit_screen_client(void){
     color_screen(BACK_COLOR);
     G8RTOS_SignalSemaphore(&lcd_SPI);
 
-    if(winner == LCD_BLUE)
+    if(winner == 0)
     {
         G8RTOS_WaitSemaphore(&lcd_SPI);
         LCD_Text((ARENA_MAX_X - ARENA_MIN_X - 50)/2, (ARENA_MAX_Y - ARENA_MIN_Y)/2, final_message_lose, LCD_PINK);
