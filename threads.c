@@ -319,71 +319,72 @@ void MoveLEDs(void){
 //                red_score = BIT0 | BIT1 | BIT2;
 //                break;
 //        }
-        switch(game_state.overallScores[1])
-        {
-            case 0:
-                red_score = 0;
-                break;
-            case 1:
-                red_score = BIT0 ;
-                break;
-            case 2:
-                red_score = BIT0 | BIT1;
-                break;
-            case 3:
-                red_score = BIT0 | BIT1 | BIT2;
-                break;
-            case 4:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3;
-                break;
-            case 5:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
-                break;
-            case 6:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
-                break;
-            case 7:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
-                break;
-            case 8:
-                red_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
-                break;
-        }
-
         switch(game_state.overallScores[0])
         {
             case 0:
                 blue_score = 0;
                 break;
             case 1:
-                blue_score = BITF;
+                blue_score = BIT0 ;
                 break;
             case 2:
-                blue_score = BITF | BITE;
+                blue_score = BIT0 | BIT1;
                 break;
             case 3:
-                blue_score = BITF | BITE | BITD;
+                blue_score = BIT0 | BIT1 | BIT2;
                 break;
             case 4:
-                blue_score = BITF | BITE | BITD | BITC;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3;
                 break;
             case 5:
-                blue_score = BITF | BITE | BITD | BITC | BITB;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
                 break;
             case 6:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
                 break;
             case 7:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6;
                 break;
             case 8:
-                blue_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
+            default:
+                blue_score = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7;
+                break;
+        }
+
+        switch(game_state.overallScores[1])
+        {
+            case 0:
+                red_score = 0;
+                break;
+            case 1:
+                red_score = BITF;
+                break;
+            case 2:
+                red_score = BITF | BITE;
+                break;
+            case 3:
+                red_score = BITF | BITE | BITD;
+                break;
+            case 4:
+                red_score = BITF | BITE | BITD | BITC;
+                break;
+            case 5:
+                red_score = BITF | BITE | BITD | BITC | BITB;
+                break;
+            case 6:
+                red_score = BITF | BITE | BITD | BITC | BITB | BITA;
+                break;
+            case 7:
+                red_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9;
+                break;
+            case 8:
+            default:
+                red_score = BITF | BITE | BITD | BITC | BITB | BITA | BIT9 | BIT8;
                 break;
         }
 
         LP3943_LedModeSet(RED, red_score);
         LP3943_LedModeSet(BLUE, blue_score);
-//        G8RTOS_KillSelf();
     }
 }
 
@@ -1316,10 +1317,10 @@ extern void JoinGame(void) {
     }
 
     // init semaphores
-    G8RTOS_InitSemaphore(&led_mutex, 0);
+    G8RTOS_InitSemaphore(&led_mutex, 1);
     // semaphore init shit
     // LED I2C mutex
-    G8RTOS_InitSemaphore(&led_I2C, 0);
+    G8RTOS_InitSemaphore(&led_I2C, 1);
 
     // sensor I2C mutex
     G8RTOS_InitSemaphore(&sensor_I2C, 1);
